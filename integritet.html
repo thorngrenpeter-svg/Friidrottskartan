@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Integritet – Friidrottskartan</title>
+<link rel="icon" href="logo.png">
+<style>
+@font-face{font-family:"Saira Condensed";font-weight:700;font-display:swap;src:url(saira-condensed-latin-700-normal.woff2) format("woff2")}
+@font-face{font-family:"Public Sans";font-weight:400;font-display:swap;src:url(public-sans-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Public Sans";font-weight:600;font-display:swap;src:url(public-sans-latin-600-normal.woff2) format("woff2")}
+:root{--bg:#f3f6f8;--panel:#fff;--ink:#15212c;--muted:#5b6b78;--line:#d8e0e6;--track:#2357b8;color-scheme:light}
+@media (prefers-color-scheme: dark){:root{--bg:#0f161d;--panel:#16202a;--ink:#e6edf2;--muted:#93a4b2;--line:#2a3743;--track:#6f9cf0;color-scheme:dark}}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:680px;margin:0 auto;padding:24px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
+h1,h2{font-family:"Saira Condensed","Arial Narrow",sans-serif;font-weight:700;line-height:1.1;text-wrap:balance}
+h1{font-size:36px;margin:16px 0 8px}
+h2{font-size:22px;margin:28px 0 6px;text-transform:uppercase;letter-spacing:.03em}
+a{color:var(--track)}
+.muted{color:var(--muted)}
+.logo img{height:44px;width:auto}
+.logo .d{display:none}
+@media (prefers-color-scheme: dark){.logo .l{display:none}.logo .d{display:inline}}
+ul{padding-left:20px}
+</style>
+</head>
+<body>
+<main>
+  <a class="logo" href="./"><img class="l" src="logo.png" alt="Friidrottskartan"><img class="d" src="logo-dark.png" alt="Friidrottskartan"></a>
+  <h1>Integritet</h1>
+  <p class="muted">Senast ändrad 25 oktober 2026</p>
+
+  <h2>Kort sagt</h2>
+  <p>Friidrottskartan visar inga namn, klubbar eller födelseår. Vi samlar inte in något om dig som besökare: inga konton, inga cookies och ingen besöksstatistik.</p>
+
+  <h2>Vilken information visas?</h2>
+  <p>Sidan hämtar varje natt kommande tävlingar från <a href="https://easyrecord.se/" target="_blank" rel="noopener">EasyRecord</a> och <a href="https://webathletics.se/" target="_blank" rel="noopener">Webathletics</a>. Från deras startlistor sparar vi bara:</p>
+  <ul>
+    <li>tävlingens namn, datum, arena, ort, arrangör och sista anmälningsdag</li>
+    <li>antal anmälda per klass och gren</li>
+    <li>de anmäldas personbästa (PB) som en anonym, sorterad lista</li>
+  </ul>
+  <p>Namn, klubb, födelseår och startnummer sparas aldrig. Vill du se vem som är anmäld länkar varje tävling till startlistan hos källan.</p>
+
+  <h2>Dina egna PB</h2>
+  <p>De PB du skriver in under "Mina PB" sparas bara i din egen webbläsare (local storage) och skickas aldrig till oss eller någon annan. Du tar bort dem genom att tömma fälten eller rensa webbplatsdata i webbläsaren.</p>
+
+  <h2>Teknik och tredje part</h2>
+  <p>Webbplatsen ligger på GitHub Pages. GitHub behandlar tekniska uppgifter som IP-adress i sina serverloggar för att kunna leverera sidan och skydda tjänsten, enligt <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHubs integritetspolicy</a>. Typsnitt, kartbibliotek och data laddas från samma server, så inga andra tjänster får uppgifter om ditt besök.</p>
+
+  <h2>Kontakt</h2>
+  <p>Har du frågor, eller vill du att något tas bort eller rättas? Mejla <strong>kontakt@friidrottskartan.se</strong>. Om du anser att vi hanterar personuppgifter felaktigt har du rätt att klaga hos <a href="https://www.imy.se/" target="_blank" rel="noopener">Integritetsskyddsmyndigheten (IMY)</a>.</p>
+
+  <p><a href="./">← Tillbaka till kartan</a></p>
+</main>
+</body>
+</html>
