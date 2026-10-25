@@ -1,0 +1,42 @@
+name: Uppdatera tävlingar
+
+on:
+  schedule:
+    - cron: "17 3 * * *"   # varje natt kl 03:17 UTC (04:17/05:17 svensk tid)
+  workflow_dispatch:        # gör att du kan köra den manuellt under fliken Actions
+
+permissions:
+  contents: write
+
+concurrency:
+  group: uppdatera-tavlingar
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+
+      - name: Installera
+        run: npm install --no-audit --no-fund
+
+      - name: Hämta tävlingar från EasyRecord och Webathletics
+        run: node scrape.mjs
+
+      - name: Spara ny data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add data.json
+          if git diff --cached --quiet; then
+            echo "Ingen ändring."
+          else
+            git commit -m "Uppdatera tävlingsdata $(date -u +%F)"
+            git push
+          fi
