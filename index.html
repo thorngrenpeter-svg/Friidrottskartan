@@ -3,9 +3,23 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Alla kommande friidrottstävlingar i Sverige på en karta, med jämförelse av ditt PB mot de anmälda.">
-<title>Friidrottskartan</title>
+<meta name="description" content="Hitta friidrottstävlingar nära dig. Alla kommande friidrottstävlingar i Sverige på en karta – sök på ort, se datum och sista anmälan, och jämför ditt PB med de anmälda i din klass.">
+<title>Friidrottskartan – alla friidrottstävlingar i Sverige på en karta</title>
+<link rel="canonical" href="https://www.friidrottskartan.se/">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="sv_SE">
+<meta property="og:url" content="https://www.friidrottskartan.se/">
+<meta property="og:title" content="Friidrottskartan – alla friidrottstävlingar i Sverige på en karta">
+<meta property="og:description" content="Sök på ort och se kommande friidrottstävlingar, datum och sista anmälan. Jämför ditt PB med de anmälda i din klass.">
+<meta property="og:image" content="https://www.friidrottskartan.se/logo.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Friidrottskartan","url":"https://www.friidrottskartan.se/","inLanguage":"sv-SE","description":"Alla kommande friidrottstävlingar i Sverige på en karta."}</script>
 <link rel="icon" href="logo.png">
+<!-- Privacy-friendly analytics by Plausible -->
+<script async src="https://plausible.io/js/pa-OC8m2tp8_c3N5miEBXl1N.js"></script>
+<script>
+  window.plausible=window.plausible||function(){(plausible.q=plausible.q||[]).push(arguments)},plausible.init=plausible.init||function(i){plausible.o=i||{}};
+  plausible.init()
+</script>
 <style>
 /* Typsnitten ligger på den här servern – inga anrop till Google. */
 @font-face{font-family:"Saira Condensed";font-weight:500;font-display:swap;src:url(saira-condensed-latin-500-normal.woff2) format("woff2")}
@@ -129,6 +143,10 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .strip i{position:absolute;top:4px;width:8px;height:8px;border-radius:50%;background:var(--track);opacity:.75;transform:translateX(-4px)}
 .strip i.me{background:var(--you);opacity:1;top:1px;width:14px;height:14px;transform:translateX(-7px);border:2px solid var(--panel)}
 .strip-l{grid-column:1/-1;display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+.about{color:var(--muted);font-size:13px;max-width:75ch}
+.about h2{font-family:var(--f-display);font-size:17px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);margin:4px 0 2px}
+.about p{margin:0}
+.about a{color:inherit}
 .h3{font-family:var(--f-display);font-weight:700;font-size:18px;letter-spacing:.03em;margin:6px 0 0}
 @media (max-width:860px){
   .main{grid-template-columns:minmax(0,1fr);height:auto}
@@ -178,6 +196,10 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
       <div class="pane" id="pane"></div>
     </section>
   </div>
+  <footer class="about">
+    <h2>Friidrottstävlingar i hela Sverige</h2>
+    <p>Friidrottskartan samlar kommande friidrottstävlingar från EasyRecord och Webathletics på ett ställe, inomhus och utomhus, för ungdomar, juniorer, seniorer och veteraner. Sök på din ort för att se tävlingar i närheten, med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa i till exempel 60 m, 200 m, längd, höjd eller kula och ser hur du ligger till jämfört med de anmälda i din åldersklass. Datan uppdateras varje natt. <a href="integritet.html">Om integritet</a></p>
+  </footer>
 </div>
 
 <script src="d3.min.js"></script>
@@ -234,8 +256,11 @@ document.querySelectorAll('[data-io]').forEach(b=>b.addEventListener('click',()=
 $('#onlymine').addEventListener('click',()=>{S.onlyMine=!S.onlyMine; $('#onlymine').setAttribute('aria-pressed',S.onlyMine); render();});
 $('#reset').addEventListener('click',()=>{S.center=null;S.cityName='';$('#city').value='';S.focusKey=null;S.sel=null;store.set('fk-state',{radius:S.radius});render(true);});
 function applySearch(){ const c=findCity($('#city').value); if(!c){ S.center=null; S.cityName=''; if($('#city').value.trim()) showMsg('Hittade ingen ort som heter "'+$('#city').value.trim()+'". Prova en större ort i närheten.'); render(true); return;}
-  $('#city').value=c[0]; S.center=[c[1],c[2]]; S.cityName=c[0]; S.focusKey=null; S.sel=null; S.tab='list'; store.set('fk-state',{radius:S.radius,city:c[0]}); render(true); }
+  $('#city').value=c[0]; S.center=[c[1],c[2]]; S.cityName=c[0]; S.focusKey=null; S.sel=null; S.tab='list'; store.set('fk-state',{radius:S.radius,city:c[0]}); render(true); if(lastTracked!==c[0]){ lastTracked=c[0]; track('Sök ort',{ort:c[0]}); } }
 let msg=''; function showMsg(t){msg=t;}
+// Besöksstatistik (Plausible): bara anonyma händelser, inga personuppgifter
+let lastTracked='';
+function track(name,props){ try{ if(window.plausible) window.plausible(name,{props}); }catch(e){} }
 
 /* ---------- filtering ---------- */
 function hasMyClass(c){ return c.e.some(e=>clsMatch(e[0],profile.cls)); }
@@ -383,10 +408,11 @@ function panePB(list){
 }
 function bindPane(){
   document.querySelectorAll('#pane .item,#pane .rkrow').forEach(b=>b.addEventListener('click',()=>{S.sel=+b.dataset.i; S.tab='list'; const c=D.comps[S.sel]; S.focusKey=c.key; render(); }));
+  document.querySelectorAll('#pane .links a').forEach(a=>a.addEventListener('click',()=>track('Till källa',{källa:/easyrecord/.test(a.href)?'EasyRecord':'Webathletics'})));
   const bb=$('#backbtn'); if(bb) bb.onclick=()=>{S.sel=null; render();};
   const ab=$('#allbtn'); if(ab) ab.onclick=()=>{S.focusKey=null; S.sel=null; render();};
   const pc=$('#pbcls'); if(pc) pc.onchange=()=>{ readPBInputs(); profile.cls=pc.value; if(!isExample) saveProfile(); render(); };
-  const ps=$('#pbsave'); if(ps) ps.onclick=()=>{ readPBInputs(); saveProfile(); render(); };
+  const ps=$('#pbsave'); if(ps) ps.onclick=()=>{ readPBInputs(); saveProfile(); render(); track('Spara PB',{klass:profile.cls}); };
   const pcl=$('#pbclear'); if(pcl) pcl.onclick=()=>{ profile.pb[profile.cls]={}; saveProfile(); render(); };
 }
 function readPBInputs(){ const o={}; document.querySelectorAll('.pbgrid input').forEach(inp=>{ const v=parseMark(inp.value,inp.dataset.d); if(v>0) o[inp.dataset.d]=+v.toFixed(2); }); profile.pb[profile.cls]=o; }
