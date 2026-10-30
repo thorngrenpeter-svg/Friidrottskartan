@@ -162,7 +162,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 <div class="app">
   <header class="top">
     <h1 class="brand"><img class="logo-l" src="logo.png" alt="Friidrottskartan" width="602" height="98"><img class="logo-d" src="logo-dark.png" alt="Friidrottskartan" width="602" height="98"></h1>
-    <div class="stamp">Kommande friidrottstävlingar från <a href="https://easyrecord.se/" target="_blank" rel="noopener">EasyRecord</a> och <a href="https://webathletics.se/" target="_blank" rel="noopener">Webathletics</a> · anmälningar hämtade <span id="upd"></span> · <a href="integritet.html">Integritet</a></div>
+    <div class="stamp">Kommande friidrottstävlingar från <a href="https://easyrecord.se/" target="_blank" rel="noopener">EasyRecord</a>, <a href="https://webathletics.se/" target="_blank" rel="noopener">Webathletics</a>, <a href="https://www.trackandfield.se/" target="_blank" rel="noopener">Track &amp; Field</a> och <a href="https://meets.rosterathletics.com/public/competitions" target="_blank" rel="noopener">Roster Athletics</a> · anmälningar hämtade <span id="upd"></span> · <a href="integritet.html">Integritet</a></div>
   </header>
 
   <form class="controls" id="ctl" autocomplete="off">
@@ -198,7 +198,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
   </div>
   <footer class="about">
     <h2>Friidrottstävlingar i hela Sverige</h2>
-    <p>Friidrottskartan samlar kommande friidrottstävlingar från EasyRecord och Webathletics på ett ställe, inomhus och utomhus, för ungdomar, juniorer, seniorer och veteraner. Sök på din ort för att se tävlingar i närheten, med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa i till exempel 60 m, 200 m, längd, höjd eller kula och ser hur du ligger till jämfört med de anmälda i din åldersklass. Datan uppdateras varje natt. <a href="integritet.html">Om integritet</a></p>
+    <p>Friidrottskartan samlar kommande friidrottstävlingar från EasyRecord, Webathletics, Track & Field och Roster Athletics på ett ställe, inomhus och utomhus, för ungdomar, juniorer, seniorer och veteraner. Sök på din ort för att se tävlingar i närheten, med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa i till exempel 60 m, 200 m, längd, höjd eller kula och ser hur du ligger till jämfört med de anmälda i din åldersklass. Datan uppdateras varje natt. <a href="integritet.html">Om integritet</a></p>
   </footer>
 </div>
 
@@ -229,8 +229,12 @@ function fmtDate(c){ const a=c.d1.split('-'), b=c.d2.split('-'); const d1=+a[2],
   return {big:d1+'–'+(+b[2]), small:m1, text:d1+(a[1]===b[1]?'':' '+m1)+'–'+(+b[2])+' '+MON[b[1]-1]+' '+b[0]}; }
 const born=yy=> yy==null?'':(yy>30? 1900+yy : 2000+yy);
 function km(a,b,c,d){const R=6371,r=Math.PI/180;const x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 2*R*Math.asin(Math.sqrt(x));}
-const srcLink=c=> c.s==='er'? {name:'EasyRecord', info:'https://easyrecord.se/info?c='+c.id, list:'https://easyrecord.se/startlist?c='+c.id, entry:'https://easyrecord.se/entry?c='+c.id}
-  : {name:'Webathletics', info:'https://webathletics.se/', list:'https://webathletics.se/entrylist/'+c.id, entry:'https://webathletics.se/'};
+const SRC={
+  er:c=>({name:'EasyRecord', list:'https://easyrecord.se/startlist?c='+c.id, info:'https://easyrecord.se/info?c='+c.id, lt:'Startlista'}),
+  wa:c=>({name:'Webathletics', list:'https://webathletics.se/entrylist/'+c.id, lt:'Deltagarlista'}),
+  tf:c=>({name:'Track & Field', list:'https://www.trackandfield.se/Home/Competition?comp='+c.id, info:'https://www.trackandfield.se/CompInfo?comp='+c.id, lt:'Startlista'}),
+  ro:c=>({name:'Roster Athletics', list:'https://meets.rosterathletics.com/public/meeting/'+c.id+'/details', lt:'Tävlingssida'})};
+const srcLink=c=>(SRC[c.s]||SRC.wa)(c);
 const clsMatch=(evCls,my)=> evCls.split(' ').includes(my);
 
 /* ---------- state ---------- */
@@ -372,7 +376,7 @@ function paneDetail(c){
    +'<dt>Arrangör</dt><dd>'+esc(c.h||'–')+'</dd>'
    +(c.r?'<dt>Sista anmälan</dt><dd>'+c.r+'</dd>':'')+(c.ro&&c.ro>D.updated?'<dt>Anmälan öppnar</dt><dd>'+c.ro+'</dd>':'')
    +(c.dist!=null?'<dt>Avstånd</dt><dd>'+Math.round(c.dist)+' km från '+esc(S.cityName)+'</dd>':'')+'</dl>'
-   +'<div class="links"><a href="'+L.list+'" target="_blank" rel="noopener">'+(c.s==='er'?'Startlista':'Deltagarlista')+' på '+L.name+' ↗</a>'+(c.s==='er'?'<a href="'+L.info+'" target="_blank" rel="noopener">Info & anmälan ↗</a>':'')+'</div>';
+   +'<div class="links"><a href="'+L.list+'" target="_blank" rel="noopener">'+L.lt+' på '+L.name+' ↗</a>'+(L.info?'<a href="'+L.info+'" target="_blank" rel="noopener">Info & anmälan ↗</a>':'')+'</div>';
   if(!c.e.length) h+='<p class="empty">Inga anmälda individuella grenar ännu, eller bara mångkamp. Se '+L.name+' för grenprogram.</p>';
   byCls.forEach(([cls,evs])=>{ const mine=clsMatch(cls,profile.cls);
     h+='<div class="clsh">'+esc(cls)+(mine?' <span class="tag you">din klass</span>':'')+'</div>';
@@ -408,7 +412,7 @@ function panePB(list){
 }
 function bindPane(){
   document.querySelectorAll('#pane .item,#pane .rkrow').forEach(b=>b.addEventListener('click',()=>{S.sel=+b.dataset.i; S.tab='list'; const c=D.comps[S.sel]; S.focusKey=c.key; render(); }));
-  document.querySelectorAll('#pane .links a').forEach(a=>a.addEventListener('click',()=>track('Till källa',{källa:/easyrecord/.test(a.href)?'EasyRecord':'Webathletics'})));
+  document.querySelectorAll('#pane .links a').forEach(a=>a.addEventListener('click',()=>track('Till källa',{källa:/easyrecord/.test(a.href)?'EasyRecord':/trackandfield/.test(a.href)?'Track & Field':/rosterathletics/.test(a.href)?'Roster Athletics':'Webathletics'})));
   const bb=$('#backbtn'); if(bb) bb.onclick=()=>{S.sel=null; render();};
   const ab=$('#allbtn'); if(ab) ab.onclick=()=>{S.focusKey=null; S.sel=null; render();};
   const pc=$('#pbcls'); if(pc) pc.onchange=()=>{ readPBInputs(); profile.cls=pc.value; if(!isExample) saveProfile(); render(); };
