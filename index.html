@@ -68,7 +68,8 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .field{display:flex;flex-direction:column;gap:3px;min-width:0}
 .field label,.lbl{font-family:var(--f-display);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .field input,.field select{height:36px;border:1px solid var(--line);background:var(--bg);border-radius:7px;padding:0 10px}
-#city{width:min(240px,60vw)}
+#city{width:min(200px,60vw)}
+#country{max-width:170px}
 .chips{display:flex;gap:4px;flex-wrap:wrap}
 .chip{height:36px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--bg);cursor:pointer;white-space:nowrap}
 .chip[aria-pressed="true"]{background:var(--track);border-color:var(--track);color:var(--panel)}
@@ -166,9 +167,10 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
   </header>
 
   <form class="controls" id="ctl" autocomplete="off">
+    <div class="field"><label for="country">Land</label><select id="country"></select></div>
     <div class="field"><label for="city">Stad</label><input id="city" list="citylist" placeholder="t.ex. Örebro"><datalist id="citylist"></datalist></div>
     <div class="field"><label for="radius">Avstånd</label>
-      <select id="radius"><option value="25">25 km</option><option value="50">50 km</option><option value="100" selected>100 km</option><option value="200">200 km</option><option value="0">Hela Sverige</option></select></div>
+      <select id="radius"><option value="25">25 km</option><option value="50">50 km</option><option value="100" selected>100 km</option><option value="200">200 km</option><option value="0" id="opt-all">Hela Sverige</option></select></div>
     <div class="field"><label for="period">Period</label><select id="period"></select></div>
     <div class="field"><span class="lbl">Arena</span>
       <div class="chips" role="group" aria-label="Inne eller ute">
@@ -198,11 +200,12 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
   </div>
   <footer class="about">
     <h2>Friidrottstävlingar i hela Sverige</h2>
-    <p>Friidrottskartan samlar kommande friidrottstävlingar från EasyRecord, Webathletics, Track & Field och Roster Athletics på ett ställe, inomhus och utomhus, för ungdomar, juniorer, seniorer och veteraner. Sök på din ort för att se tävlingar i närheten, med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa i till exempel 60 m, 200 m, längd, höjd eller kula och ser hur du ligger till jämfört med de anmälda i din åldersklass. Datan uppdateras varje natt. <a href="integritet.html">Om integritet</a></p>
+    <p>Friidrottskartan samlar kommande friidrottstävlingar från EasyRecord, Webathletics, Track & Field och Roster Athletics på ett ställe, inomhus och utomhus, i Sverige och via Roster Athletics även i andra länder, för ungdomar, juniorer, seniorer och veteraner. Sök på din ort för att se tävlingar i närheten, med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa i till exempel 60 m, 200 m, längd, höjd eller kula och ser hur du ligger till jämfört med de anmälda i din åldersklass. Datan uppdateras varje natt. Kartdata: Natural Earth. Orter utanför Sverige: © <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>-bidragsgivare. <a href="integritet.html">Om integritet</a></p>
   </footer>
 </div>
 
 <script src="d3.min.js"></script>
+<script src="topojson-client.min.js"></script>
 <script>
 Promise.all(['geo.json','data.json?v='+Date.now()].map(u=>fetch(u).then(r=>{if(!r.ok)throw new Error(u);return r.json();})))
 .then(([GEO,D])=>{
@@ -215,7 +218,12 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
-D.comps.forEach((c,i)=>{c.idx=i;c.key=c.la.toFixed(3)+','+c.lo.toFixed(3)});
+D.comps.forEach((c,i)=>{c.idx=i;c.co=c.co||'SWE';c.key=c.la.toFixed(3)+','+c.lo.toFixed(3)});
+D.cities.forEach(c=>{c[3]=c[3]||'SWE'});
+/* ---------- länder ---------- */
+const ISO3=Object.fromEntries('ABWAW AFGAF AGOAO AIAAI ALAAX ALBAL ANDAD AREAE ARGAR ARMAM ASMAS ATAAQ ATFTF ATGAG AUSAU AUTAT AZEAZ BDIBI BELBE BENBJ BESBQ BFABF BGDBD BGRBG BHRBH BHSBS BIHBA BLMBL BLRBY BLZBZ BMUBM BOLBO BRABR BRBBB BRNBN BTNBT BVTBV BWABW CAFCF CANCA CCKCC CHECH CHLCL CHNCN CIVCI CMRCM CODCD COGCG COKCK COLCO COMKM CPVCV CRICR CUBCU CUWCW CXRCX CYMKY CYPCY CZECZ DEUDE DJIDJ DMADM DNKDK DOMDO DZADZ ECUEC EGYEG ERIER ESHEH ESPES ESTEE ETHET FINFI FJIFJ FLKFK FRAFR FROFO FSMFM GABGA GBRGB GEOGE GGYGG GHAGH GIBGI GINGN GLPGP GMBGM GNBGW GNQGQ GRCGR GRDGD GRLGL GTMGT GUFGF GUMGU GUYGY HKGHK HMDHM HNDHN HRVHR HTIHT HUNHU IDNID IMNIM INDIN IOTIO IRLIE IRNIR IRQIQ ISLIS ISRIL ITAIT JAMJM JEYJE JORJO JPNJP KAZKZ KENKE KGZKG KHMKH KIRKI KNAKN KORKR KWTKW LAOLA LBNLB LBRLR LBYLY LCALC LIELI LKALK LSOLS LTULT LUXLU LVALV MACMO MAFMF MARMA MCOMC MDAMD MDGMG MDVMV MEXMX MHLMH MKDMK MLIML MLTMT MMRMM MNEME MNGMN MNPMP MOZMZ MRTMR MSRMS MTQMQ MUSMU MWIMW MYSMY MYTYT NAMNA NCLNC NERNE NFKNF NGANG NICNI NIUNU NLDNL NORNO NPLNP NRUNR NZLNZ OMNOM PAKPK PANPA PCNPN PERPE PHLPH PLWPW PNGPG POLPL PRIPR PRKKP PRTPT PRYPY PSEPS PYFPF QATQA REURE ROURO RUSRU RWARW SAUSA SDNSD SENSN SGPSG SGSGS SHNSH SJMSJ SLBSB SLESL SLVSV SMRSM SOMSO SPMPM SRBRS SSDSS STPST SURSR SVKSK SVNSI SWESE SWZSZ SXMSX SYCSC SYRSY TCATC TCDTD TGOTG THATH TJKTJ TKLTK TKMTM TLSTL TONTO TTOTT TUNTN TURTR TUVTV TWNTW TZATZ UGAUG UKRUA UMIUM URYUY USAUS UZBUZ VATVA VCTVC VENVE VGBVG VIRVI VNMVN VUTVU WLFWF WSMWS XKKXK YEMYE ZAFZA ZMBZM ZWEZW'.split(' ').map(x=>[x.slice(0,3),x.slice(3)]));
+const DN=(()=>{try{return new Intl.DisplayNames(['sv'],{type:'region'})}catch(e){return null}})();
+function coName(a3){ if(a3==='SWE') return 'Sverige'; if(a3==='all') return 'Alla länder'; try{ return (DN&&ISO3[a3]&&DN.of(ISO3[a3]))||a3; }catch(e){ return a3; } }
 const [y,m,dd]=D.updated.split('-'); $('#upd').textContent=(+dd)+' '+MON[m-1]+' '+y;
 
 /* ---------- formatting ---------- */
@@ -239,7 +247,7 @@ const clsMatch=(evCls,my)=> evCls.split(' ').includes(my);
 
 /* ---------- state ---------- */
 const saved=store.get('fk-state',{});
-const S={center:null, cityName:'', radius:saved.radius??100, period:'all', io:'all', onlyMine:false, tab:'list', sel:null, focusKey:null};
+const S={country:saved.country||'SWE', center:null, cityName:'', radius:saved.radius??100, period:'all', io:'all', onlyMine:false, tab:'list', sel:null, focusKey:null};
 let profile=store.get('fk-profile',null);
 let isExample=false;
 if(!profile){ profile={cls:'P13', pb:{P13:{'60 m':9.4,'Längd':4.2,'Kula':7.5}}}; isExample=true; }
@@ -247,20 +255,32 @@ const myPB=()=> (profile.pb[profile.cls]||{});
 function saveProfile(){ isExample=false; store.set('fk-profile',profile); }
 
 /* ---------- controls ---------- */
-const dl=$('#citylist'); dl.innerHTML=D.cities.map(c=>'<option value="'+esc(c[0])+'">').join('');
+const TODAY0=new Date().toLocaleDateString('sv-SE');
+const coCount=d3.rollup(D.comps.filter(c=>c.d2>=TODAY0),v=>v.length,c=>c.co);
+if(S.country!=='all' && S.country!=='SWE' && !coCount.has(S.country)) S.country='SWE';
+const others=[...coCount.keys()].filter(k=>k!=='SWE').sort((a,b)=>coName(a).localeCompare(coName(b),'sv'));
+$('#country').innerHTML=['SWE',...others].map(k=>'<option value="'+k+'">'+esc(coName(k))+' ('+(coCount.get(k)||0)+')</option>').join('')+(others.length?'<option value="all">Alla länder ('+d3.sum([...coCount.values()])+')</option>':'');
+$('#country').value=S.country;
+const cityPool=()=> S.country==='all'? D.cities : D.cities.filter(c=>c[3]===S.country);
+const dl=$('#citylist');
+function fillCities(){ const seen=new Set(); dl.innerHTML=cityPool().filter(c=>!seen.has(c[0])&&seen.add(c[0])).map(c=>'<option value="'+esc(c[0])+'">').join('');
+  $('#opt-all').textContent=S.country==='all'?'Alla länder':'Hela '+coName(S.country);
+  $('#city').placeholder=S.country==='SWE'?'t.ex. Örebro':S.country==='all'?'Sök ort':'t.ex. '+((cityPool().find(c=>D.comps.some(x=>x.c===c[0]&&x.co===c[3]))||[''])[0]); }
+fillCities();
+$('#country').addEventListener('change',async()=>{ S.country=$('#country').value; S.center=null; S.cityName=''; $('#city').value=''; S.focusKey=null; S.sel=null; fillCities(); store.set('fk-state',{radius:S.radius,country:S.country}); await setBase(S.country); render(true); track('Välj land',{land:coName(S.country)}); });
 const months=[...new Set(D.comps.map(c=>c.d1.slice(0,7)))].sort();
 $('#period').innerHTML='<option value="all">Alla kommande</option>'+months.map(k=>{const [yy,mm]=k.split('-');return '<option value="'+k+'">'+MON[mm-1].replace(/^./,x=>x.toUpperCase())+' '+yy+'</option>'}).join('');
 $('#radius').value=String(S.radius);
-function findCity(q){ q=q.trim().toLowerCase(); if(!q) return null; let c=D.cities.find(x=>x[0].toLowerCase()===q); if(!c) c=D.cities.find(x=>x[0].toLowerCase().startsWith(q)); if(!c) c=D.cities.find(x=>x[0].toLowerCase().includes(q)); return c; }
+function findCity(q){ q=q.trim().toLowerCase(); if(!q) return null; const P=cityPool(); let c=P.find(x=>x[0].toLowerCase()===q); if(!c) c=P.find(x=>x[0].toLowerCase().startsWith(q)); if(!c) c=P.find(x=>x[0].toLowerCase().includes(q)); return c; }
 $('#ctl').addEventListener('submit',e=>{e.preventDefault(); applySearch();});
 $('#city').addEventListener('change',applySearch);
-$('#radius').addEventListener('change',()=>{S.radius=+$('#radius').value; store.set('fk-state',{radius:S.radius,city:S.cityName}); render(true);});
+$('#radius').addEventListener('change',()=>{S.radius=+$('#radius').value; store.set('fk-state',{radius:S.radius,city:S.cityName,country:S.country}); render(true);});
 $('#period').addEventListener('change',()=>{S.period=$('#period').value; render();});
 document.querySelectorAll('[data-io]').forEach(b=>b.addEventListener('click',()=>{S.io=b.dataset.io; document.querySelectorAll('[data-io]').forEach(x=>x.setAttribute('aria-pressed',x===b)); render();}));
 $('#onlymine').addEventListener('click',()=>{S.onlyMine=!S.onlyMine; $('#onlymine').setAttribute('aria-pressed',S.onlyMine); render();});
-$('#reset').addEventListener('click',()=>{S.center=null;S.cityName='';$('#city').value='';S.focusKey=null;S.sel=null;store.set('fk-state',{radius:S.radius});render(true);});
+$('#reset').addEventListener('click',()=>{S.center=null;S.cityName='';$('#city').value='';S.focusKey=null;S.sel=null;store.set('fk-state',{radius:S.radius,country:S.country});render(true);});
 function applySearch(){ const c=findCity($('#city').value); if(!c){ S.center=null; S.cityName=''; if($('#city').value.trim()) showMsg('Hittade ingen ort som heter "'+$('#city').value.trim()+'". Prova en större ort i närheten.'); render(true); return;}
-  $('#city').value=c[0]; S.center=[c[1],c[2]]; S.cityName=c[0]; S.focusKey=null; S.sel=null; S.tab='list'; store.set('fk-state',{radius:S.radius,city:c[0]}); render(true); if(lastTracked!==c[0]){ lastTracked=c[0]; track('Sök ort',{ort:c[0]}); } }
+  $('#city').value=c[0]; S.center=[c[1],c[2]]; S.cityName=c[0]; S.focusKey=null; S.sel=null; S.tab='list'; store.set('fk-state',{radius:S.radius,city:c[0],country:S.country}); render(true); if(lastTracked!==c[0]){ lastTracked=c[0]; track('Sök ort',{ort:c[0]}); } }
 let msg=''; function showMsg(t){msg=t;}
 // Besöksstatistik (Plausible): bara anonyma händelser, inga personuppgifter
 let lastTracked='';
@@ -272,6 +292,7 @@ function visible(){
   const TODAY=new Date().toLocaleDateString('sv-SE');
   return D.comps.filter(c=>{
     if(c.d2<TODAY) return false;
+    if(S.country!=='all' && c.co!==S.country) return false;
     if(S.period!=='all' && !(c.d1.slice(0,7)<=S.period && c.d2.slice(0,7)>=S.period)) return false;
     if(S.io!=='all' && String(c.i)!==S.io) return false;
     if(S.onlyMine && !hasMyClass(c)) return false;
@@ -282,16 +303,42 @@ function visible(){
 }
 
 /* ---------- map ---------- */
-const svg=d3.select('#map'); const W=GEO.W,H=GEO.H;
-svg.attr('viewBox','0 0 '+W+' '+H).attr('preserveAspectRatio','xMidYMid meet');
-const proj=d3.geoTransverseMercator().rotate(GEO.rotate).scale(GEO.scale).translate(GEO.translate);
-const kmPerPx=6371/GEO.scale;
+const svg=d3.select('#map'); let W=GEO.W,H=GEO.H,proj,kmPerPx;
+svg.attr('preserveAspectRatio','xMidYMid meet');
 const g=svg.append('g');
-g.append('path').attr('class','nb').attr('d',GEO.nb);
-g.append('path').attr('class','se').attr('d',GEO.se);
-const gCities=g.append('g'); const gCtr=g.append('g').attr('class','ctr'); const gMk=g.append('g');
+const gBase=g.append('g'); const gCities=g.append('g'); const gCtr=g.append('g').attr('class','ctr'); const gMk=g.append('g');
 const refCities=['Stockholm','Göteborg','Malmö','Uppsala','Umeå','Luleå','Östersund','Sundsvall','Karlstad','Jönköping','Kiruna','Kalmar','Gävle','Växjö','Örebro','Linköping','Visby','Falun'];
-refCities.forEach(n=>{const c=D.cities.find(x=>x[0]===n); if(!c) return; const [x,y]=proj([c[2],c[1]]); gCities.append('text').attr('class','cityl').attr('data-x',x).attr('data-y',y).text(n); gCities.append('circle').attr('cx',x).attr('cy',y).attr('r',1.6).attr('fill','var(--muted)');});
+let WORLD=null;
+async function loadWorld(){ if(!WORLD){ const t=await fetch('world.json').then(r=>r.json()); WORLD=topojson.feature(t,t.objects.countries).features; } return WORLD; }
+function biggestPart(f){ if(!f||f.geometry.type!=='MultiPolygon') return f; const parts=f.geometry.coordinates.map(c=>({type:'Feature',geometry:{type:'Polygon',coordinates:c}})); const a=parts.map(p=>d3.geoArea(p)); const mx=Math.max(...a);
+  return {type:'Feature',geometry:{type:'MultiPolygon',coordinates:f.geometry.coordinates.filter((c,i)=>a[i]>=mx*0.08)}}; }
+async function setBase(co){
+  gBase.selectAll('*').remove(); gCities.selectAll('*').remove();
+  let refs;
+  if(co==='SWE'){
+    W=GEO.W; H=GEO.H; proj=d3.geoTransverseMercator().rotate(GEO.rotate).scale(GEO.scale).translate(GEO.translate); kmPerPx=6371/GEO.scale;
+    gBase.append('path').attr('class','nb').attr('d',GEO.nb); gBase.append('path').attr('class','se').attr('d',GEO.se);
+    refs=refCities.map(n=>D.cities.find(x=>x[0]===n&&x[3]==='SWE')).filter(Boolean);
+  } else {
+    let feats=[]; try{ feats=await loadWorld(); }catch(e){}
+    const comps=D.comps.filter(c=>co==='all'||c.co===co);
+    const pts={type:'Feature',geometry:{type:'MultiPoint',coordinates:comps.map(c=>[c.lo,c.la])}};
+    const land=co==='all'?null:biggestPart(feats.find(f=>f.id===co));
+    const target={type:'FeatureCollection',features:[pts].concat(land?[land]:[])};
+    const p0=(co==='all'?d3.geoNaturalEarth1():d3.geoMercator()).fitWidth(800,target);
+    const b=d3.geoPath(p0).bounds(target); const asp=Math.max(0.45,Math.min(1.9,(b[1][1]-b[0][1])/Math.max(1,b[1][0]-b[0][0])));
+    W=800; H=Math.round(800*asp);
+    proj=p0.fitExtent([[30,30],[W-30,H-30]],target);
+    const ctr=d3.geoCentroid(target); kmPerPx=6371*Math.cos((co==='all'?0:ctr[1])*Math.PI/180)/proj.scale();
+    const path=d3.geoPath(proj);
+    gBase.selectAll('path').data(feats).join('path').attr('class',f=>(co==='all'?coCount.has(f.id):f.id===co)?'se':'nb').attr('d',path);
+    const byCity=co==='all'?[]:d3.rollups(comps,v=>v.length,c=>c.c).sort((a,b)=>b[1]-a[1]).slice(0,10).map(x=>x[0]);
+    refs=byCity.map(n=>D.cities.find(x=>x[0]===n&&(co==='all'||x[3]===co))).filter(Boolean);
+  }
+  svg.attr('viewBox','0 0 '+W+' '+H).attr('aria-label','Karta över '+(co==='all'?'världen':coName(co))+' med tävlingsplatser');
+  refs.forEach(c=>{ const [x,y]=proj([c[2],c[1]]); gCities.append('text').attr('class','cityl').attr('data-x',x).attr('data-y',y).text(c[0]); gCities.append('circle').attr('cx',x).attr('cy',y).attr('r',1.6).attr('fill','var(--muted)'); });
+  svg.call(zoom.transform,d3.zoomIdentity);
+}
 let kNow=1;
 const zoom=d3.zoom().scaleExtent([0.8,24]).on('zoom',ev=>{g.attr('transform',ev.transform); kNow=ev.transform.k; sizeMarkers();});
 window.addEventListener('resize',()=>sizeMarkers());
@@ -299,7 +346,7 @@ svg.call(zoom);
 $('#zin').onclick=()=>svg.transition().duration(250).call(zoom.scaleBy,1.6);
 $('#zout').onclick=()=>svg.transition().duration(250).call(zoom.scaleBy,1/1.6);
 function vbS(){const n=svg.node();return Math.min((n.clientWidth||600)/W,(n.clientHeight||1300)/H)||0.5;}
-function sizeMarkers(){ const s0=vbS(); const f=(1+0.15*Math.log2(Math.max(1,kNow)))/kNow/s0; gCities.selectAll('text').attr('font-size',11.5/kNow/s0).attr('x',function(){return +this.dataset.x+5/kNow/s0}).attr('y',function(){return +this.dataset.y-4/kNow/s0}); gCities.selectAll('circle').attr('r',2/kNow/s0); gMk.selectAll('g.mk').each(function(d){ const s=d3.select(this); s.select('circle').attr('r',(d.n>1?11:7)*f); s.select('text').attr('font-size',12*f); }); }
+function sizeMarkers(){ const s0=vbS(); const f=(1+0.15*Math.log2(Math.max(1,kNow)))/kNow/s0; gCities.selectAll('text').style('font-size',(11.5/kNow/s0)+'px').attr('x',function(){return +this.dataset.x+5/kNow/s0}).attr('y',function(){return +this.dataset.y-4/kNow/s0}); gCities.selectAll('circle').attr('r',2/kNow/s0); gMk.selectAll('g.mk').each(function(d){ const s=d3.select(this); s.select('circle').attr('r',(d.n>1?11:7)*f); s.select('text').attr('font-size',12*f); }); }
 function fitTo(bounds){ const [[x0,y0],[x1,y1]]=bounds; const bw=svg.node().clientWidth||600, bh=svg.node().clientHeight||600;
   // viewBox meet scaling
   const k=Math.min(24,0.9/Math.max((x1-x0)/W,(y1-y0)/H)); const cx=(x0+x1)/2, cy=(y0+y1)/2;
@@ -342,7 +389,7 @@ function myEvents(c){ const pb=myPB(); return c.e.filter(e=>clsMatch(e[0],profil
 
 /* ---------- panes ---------- */
 function itemHTML(c){ const dt=fmtDate(c); const mine=hasMyClass(c); const n=c.e.reduce((a,e)=>a+e[3],0);
-  return '<button class="item" data-i="'+c.idx+'"><div class="date"><b>'+dt.big+'</b><span>'+dt.small+'</span></div><div><h3>'+esc(c.n)+'</h3><div class="meta">'+esc(c.c)+' · '+esc(c.v)+'</div><div class="tags">'
+  return '<button class="item" data-i="'+c.idx+'"><div class="date"><b>'+dt.big+'</b><span>'+dt.small+'</span></div><div><h3>'+esc(c.n)+'</h3><div class="meta">'+esc(c.c)+(c.v?' · '+esc(c.v):'')+(S.country==='all'&&c.co!=='SWE'?' · '+esc(coName(c.co)):'')+'</div><div class="tags">'
    +'<span class="tag">'+(c.i?'Inomhus':'Utomhus')+'</span>'
    +(n?'<span class="tag">'+n+(n===1?' anmälan':' anmälningar')+'</span>':'<span class="tag">Inga anmälda än</span>')
    +(mine?'<span class="tag you">'+esc(profile.cls)+' finns</span>':'')
@@ -352,7 +399,7 @@ function paneList(list){
   if(msg){ h+='<p class="summary" style="color:var(--warn)">'+esc(msg)+'</p>'; msg=''; }
   let shown=list;
   if(S.focusKey){ shown=list.filter(c=>c.key===S.focusKey); h+='<p class="summary">'+shown.length+' tävling'+(shown.length>1?'ar':'')+' i '+esc(shown[0]?.c||'')+' · <button class="back" id="allbtn">Visa alla</button></p>'; }
-  else h+='<p class="summary">'+list.length+' kommande tävling'+(list.length===1?'':'ar')+(S.center?(S.radius>0?' inom '+S.radius+' km från '+esc(S.cityName):' sorterade på avstånd från '+esc(S.cityName)):' i hela Sverige')+'</p>';
+  else h+='<p class="summary">'+list.length+' kommande tävling'+(list.length===1?'':'ar')+(S.center?(S.radius>0?' inom '+S.radius+' km från '+esc(S.cityName):' sorterade på avstånd från '+esc(S.cityName)):(S.country==='all'?' i alla länder':' i '+(S.country==='SWE'?'hela Sverige':esc(coName(S.country)))))+'</p>';
   if(S.center && S.radius===0) shown=[...shown].sort((a,b)=>a.dist-b.dist);
   h+= shown.length? '<div class="list">'+shown.map(itemHTML).join('')+'</div>' : '<p class="empty">Inga tävlingar matchar. Öka avståndet eller välj en annan period.</p>';
   return h;
@@ -372,7 +419,7 @@ function paneDetail(c){
   const byCls=d3.groups(c.e,e=>e[0]);
   byCls.sort((a,b)=> (clsMatch(b[0],profile.cls)-clsMatch(a[0],profile.cls)) || a[0].localeCompare(b[0],'sv',{numeric:true}));
   let h='<div class="detail"><button class="back" id="backbtn">← Tillbaka till listan</button><h2>'+esc(c.n)+'</h2>'
-   +'<dl class="facts"><dt>Datum</dt><dd>'+dt.text+'</dd><dt>Plats</dt><dd>'+esc(c.v)+', '+esc(c.c)+(c.i?' (inomhus)':' (utomhus)')+(c.ap?' <span class="meta">· kartpunkten visar orten</span>':'')+'</dd>'
+   +'<dl class="facts"><dt>Datum</dt><dd>'+dt.text+'</dd><dt>Plats</dt><dd>'+(c.v?esc(c.v)+', ':'')+esc(c.c)+(c.co!=='SWE'?', '+esc(coName(c.co)):'')+(c.i?' (inomhus)':' (utomhus)')+(c.ap?' <span class="meta">· kartpunkten visar orten</span>':'')+'</dd>'
    +'<dt>Arrangör</dt><dd>'+esc(c.h||'–')+'</dd>'
    +(c.r?'<dt>Sista anmälan</dt><dd>'+c.r+'</dd>':'')+(c.ro&&c.ro>D.updated?'<dt>Anmälan öppnar</dt><dd>'+c.ro+'</dd>':'')
    +(c.dist!=null?'<dt>Avstånd</dt><dd>'+Math.round(c.dist)+' km från '+esc(S.cityName)+'</dd>':'')+'</dl>'
@@ -435,8 +482,8 @@ function render(refit){
 }
 // restore last city
 if(saved.city){ const c=findCity(saved.city); if(c){ $('#city').value=c[0]; S.center=[c[1],c[2]]; S.cityName=c[0]; } }
-render(true);
-}).catch(()=>{document.getElementById('pane').innerHTML='<p class="empty">Kunde inte läsa tävlingsdatan. Ladda om sidan om en stund.</p>';});
+setBase(S.country).then(()=>render(true));
+}).catch(e=>{console.error(e);document.getElementById('pane').innerHTML='<p class="empty">Kunde inte läsa tävlingsdatan. Ladda om sidan om en stund.</p>';});
 </script>
 
 </body>

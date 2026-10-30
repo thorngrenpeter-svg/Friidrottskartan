@@ -268,6 +268,26 @@ async function scrapeTrackAndField(cityCoords) {
   return comps;
 }
 
+
+/* ---------- orter utanför Sverige: koordinater via OpenStreetMap (Nominatim), cachas i data.json ---------- */
+const ISO3 = Object.fromEntries('ABWAW AFGAF AGOAO AIAAI ALAAX ALBAL ANDAD AREAE ARGAR ARMAM ASMAS ATAAQ ATFTF ATGAG AUSAU AUTAT AZEAZ BDIBI BELBE BENBJ BESBQ BFABF BGDBD BGRBG BHRBH BHSBS BIHBA BLMBL BLRBY BLZBZ BMUBM BOLBO BRABR BRBBB BRNBN BTNBT BVTBV BWABW CAFCF CANCA CCKCC CHECH CHLCL CHNCN CIVCI CMRCM CODCD COGCG COKCK COLCO COMKM CPVCV CRICR CUBCU CUWCW CXRCX CYMKY CYPCY CZECZ DEUDE DJIDJ DMADM DNKDK DOMDO DZADZ ECUEC EGYEG ERIER ESHEH ESPES ESTEE ETHET FINFI FJIFJ FLKFK FRAFR FROFO FSMFM GABGA GBRGB GEOGE GGYGG GHAGH GIBGI GINGN GLPGP GMBGM GNBGW GNQGQ GRCGR GRDGD GRLGL GTMGT GUFGF GUMGU GUYGY HKGHK HMDHM HNDHN HRVHR HTIHT HUNHU IDNID IMNIM INDIN IOTIO IRLIE IRNIR IRQIQ ISLIS ISRIL ITAIT JAMJM JEYJE JORJO JPNJP KAZKZ KENKE KGZKG KHMKH KIRKI KNAKN KORKR KWTKW LAOLA LBNLB LBRLR LBYLY LCALC LIELI LKALK LSOLS LTULT LUXLU LVALV MACMO MAFMF MARMA MCOMC MDAMD MDGMG MDVMV MEXMX MHLMH MKDMK MLIML MLTMT MMRMM MNEME MNGMN MNPMP MOZMZ MRTMR MSRMS MTQMQ MUSMU MWIMW MYSMY MYTYT NAMNA NCLNC NERNE NFKNF NGANG NICNI NIUNU NLDNL NORNO NPLNP NRUNR NZLNZ OMNOM PAKPK PANPA PCNPN PERPE PHLPH PLWPW PNGPG POLPL PRIPR PRKKP PRTPT PRYPY PSEPS PYFPF QATQA REURE ROURO RUSRU RWARW SAUSA SDNSD SENSN SGPSG SGSGS SHNSH SJMSJ SLBSB SLESL SLVSV SMRSM SOMSO SPMPM SRBRS SSDSS STPST SURSR SVKSK SVNSI SWESE SWZSZ SXMSX SYCSC SYRSY TCATC TCDTD TGOTG THATH TJKTJ TKLTK TKMTM TLSTL TONTO TTOTT TUNTN TURTR TUVTV TWNTW TZATZ UGAUG UKRUA UMIUM URYUY USAUS UZBUZ VATVA VCTVC VENVE VGBVG VIRVI VNMVN VUTVU WLFWF WSMWS XKKXK YEMYE ZAFZA ZMBZM ZWEZW'.split(' ').map(x => [x.slice(0, 3), x.slice(3)]));
+export const iso2 = a3 => ISO3[a3] || '';
+const geoCache = new Map(); // "ort|LAND" -> [lat, lng, LAND] eller null
+async function geocode(city, co) {
+  const key = city.toLowerCase() + '|' + co;
+  if (geoCache.has(key)) return geoCache.get(key);
+  let res = null;
+  try {
+    const q = new URLSearchParams({ q: city, format: 'jsonv2', limit: '1', addressdetails: '1', 'accept-language': 'sv' });
+    if (iso2(co)) q.set('countrycodes', iso2(co).toLowerCase());
+    const r = await fetch('https://nominatim.openstreetmap.org/search?' + q, { headers: { 'User-Agent': 'Friidrottskartan/1.0 (spring@friidrottskartan.se)' } });
+    await sleep(1100); // Nominatims regel: högst 1 anrop per sekund
+    if (r.ok) { const j = await r.json(); if (j[0]) { const cc2 = (j[0].address?.country_code || '').toUpperCase(); const a3 = Object.keys(ISO3).find(k => ISO3[k] === cc2) || co; res = [+(+j[0].lat).toFixed(3), +(+j[0].lon).toFixed(3), a3]; } }
+  } catch (e) { console.warn(`  geokodning misslyckades för ${city}: ${e.message}`); }
+  geoCache.set(key, res);
+  return res;
+}
+
 /* ---------- Roster Athletics (öppet JSON-gränssnitt) ---------- */
 const RO = 'https://api.meets.rosterathletics.com/api/public';
 const RO_EVENTS = [[/^(\d+)m Hurdles$/i, m => fmtDist(m[1]) + ' häck'], [/^(\d+)m Steeplechase$/i, m => fmtDist(m[1]) + ' hinder'], [/^(\d+)m Race ?Walk$/i, m => fmtDist(m[1]) + ' gång'], [/^(\d+)m$/i, m => fmtDist(m[1])],
@@ -286,10 +306,13 @@ async function post(url, body) {
 async function scrapeRoster(cityCoords) {
   const resolve = makeCityResolver(cityCoords);
   const meets = [];
-  let body = { tz: 'Europe/Stockholm', tzMinutes: 60, countryCode: 'SWE', first: true, afterFilter: today };
-  for (let page = 0; page < 10; page++) { // max 10 sidor
+  let body = { tz: 'Europe/Stockholm', tzMinutes: 60, first: true, afterFilter: today }; // alla länder
+  for (let page = 0; page < 60; page++) { // max 60 sidor à 15
     const j = await post(`${RO}/meeting/search/v2`, body);
-    meets.push(...(j.meets || []));
+    const ids = new Set(meets.map(x => x.meetingId));
+    const nw = (j.meets || []).filter(x => !ids.has(x.meetingId));
+    meets.push(...nw);
+    if (!nw.length) break;
     if (!(j.after > 0) || !j.meets?.length) break;
     const last = j.meets[j.meets.length - 1];
     body = { ...body, first: null, after: last.startDateTime, afterId: last.meetingId };
@@ -298,7 +321,8 @@ async function scrapeRoster(cityCoords) {
   const comps = [];
   for (const m of meets) {
     try {
-      if (m.restricted) continue;
+      if (m.restricted || /\btest\b/i.test(m.meetingName || '')) continue;
+      const year = +String(m.startDateTime).slice(0, 4);
       const d = await get(`${RO}/meeting/${m.meetingId}/details`, true);
       const se = Object.fromEntries((d.sportEvents || []).map(x => [x.eventIdPk, x]));
       const ag = Object.fromEntries((d.ageGroups || []).map(x => [x.ageGroupIdPk, x]));
@@ -310,12 +334,16 @@ async function scrapeRoster(cityCoords) {
         const disc = roDisc(s.eventName); if (!disc) continue;
         const res = await get(`${RO}/meeting/${m.meetingId}/results-v2/${ev.meetingEventIdPk}`, true);
         const gender = Object.fromEntries((res.athleteList || []).map(a => [a.athleteIdPk, a.gender]));
+        // födelseår används bara här för att räkna fram svensk åldersklass och sparas aldrig
+        const yob = Object.fromEntries((res.athleteList || []).map(a => [a.athleteIdPk, +a.yearOfBirth || 0]));
         const a = ag[ev.ageGroupIdFk] || {};
         for (const { entityDto: p } of res.mpList || []) {
           if (!p || p.startStatus === 'Scratched' || p.startStatus === 'DNS') continue;
           const g = ev.gender === 'Mixed' ? gender[p.athleteIdFk] : ev.gender;
           let cls;
-          if (a.category === 'Meeting' && a.rangeStart > 0 && a.rangeStart === a.rangeEnd) cls = (g === 'Female' ? 'F' : 'P') + a.rangeStart;
+          const age = yob[p.athleteIdFk] ? year - yob[p.athleteIdFk] : 0;
+          if (age >= 7 && age <= 99) cls = age >= 20 ? (g === 'Female' ? 'K' : 'M') : (g === 'Female' ? 'F' : 'P') + (age <= 15 ? age : age <= 17 ? 17 : 19);
+          else if (a.category === 'Meeting' && a.rangeStart > 0 && a.rangeStart === a.rangeEnd) cls = (g === 'Female' ? 'F' : 'P') + a.rangeStart;
           else if (/vet/i.test(ev.label || '')) cls = g === 'Female' ? 'Veteraner Kvinnor' : 'Veteraner Män';
           else if (/^[FPKM]\d{0,2}$/.test(a.name || '')) cls = a.name;
           else cls = g === 'Female' ? 'K' : 'M';
@@ -327,14 +355,17 @@ async function scrapeRoster(cityCoords) {
         }
       }
       const e = [...groups].map(([k, gm]) => { const [cls, disc] = k.split('|'); return anonEvent(cls, disc, '', [...gm.values()]); });
-      const lat = +(d.address?.latitude ?? d.latitude ?? m.latitude), lng = +(d.address?.longitude ?? d.longitude ?? m.longitude);
-      const hit = resolve(d.address?.city, m.city, d.address?.venueName || m.venueName, m.meetingName);
-      let city, la, lo, ap = 1;
-      if (hit) { city = hit[0]; [la, lo] = hit[1]; }
-      else if (lat > 55 && lat < 70 && lng > 10 && lng < 25) { city = d.address?.city || m.city || 'Okänd ort'; la = lat; lo = lng; ap = 0; }
-      else { console.warn(`  Roster: okänd ort "${d.address?.city || m.city}" för ${m.meetingName}`); continue; }
-      if (hit && lat > 55 && lat < 70 && lng > 10 && lng < 25) { la = lat; lo = lng; ap = 0; }
-      comps.push({ s: 'ro', id: String(m.meetingId), n: (m.meetingName || '').trim(), c: city, v: d.address?.venueName || m.venueName || '', la, lo, ap,
+      const co = d.address?.countryCode || m.countryCode || 'SWE';
+      const rawCity = (d.address?.city || m.city || '').trim();
+      let city, la, lo, cc3 = /^[A-Z]{3}$/.test(co) && iso2(co) ? co : '';
+      const hit = co === 'SWE' ? resolve(rawCity, d.address?.venueName || m.venueName, m.meetingName) : null;
+      if (hit) { city = hit[0]; [la, lo] = hit[1]; cc3 = 'SWE'; }
+      else {
+        const gc = rawCity ? await geocode(rawCity, cc3) : null;
+        if (!gc) { console.warn(`  Roster: hittar inte orten "${rawCity}" (${co}) för ${m.meetingName}`); continue; }
+        city = rawCity; [la, lo, cc3] = gc;
+      }
+      comps.push({ s: 'ro', co: cc3, id: String(m.meetingId), n: (m.meetingName || '').trim(), c: city, v: d.address?.venueName || m.venueName || '', la, lo, ap: 1,
         d1: m.startDateTime.slice(0, 10), d2: (m.endDateTime || m.startDateTime).slice(0, 10), h: d.organiserDisplayName || d.organiserName || '',
         i: d.season === 'Indoor' ? 1 : 0, r: (d.registrationDeadline || m.registrationDeadline || '').slice(0, 10), ro: '', e });
     } catch (err) { console.warn(`  varning Roster ${m.meetingId}: ${err.message}`); }
@@ -352,9 +383,11 @@ async function main() {
   const venues = venuesPath ? JSON.parse(await fs.readFile(venuesPath, 'utf8')) : {};
   const cityCoords = Object.fromEntries(cities.map(c => [c[0], [c[1], c[2]]]));
 
+  let old = null; try { old = JSON.parse(await fs.readFile(OUT, 'utf8')); } catch {}
+  for (const c of old?.cities || []) if (c[3] && c[3] !== 'SWE') { const v = [c[1], c[2], c[3]]; geoCache.set(c[0].toLowerCase() + '|' + c[3], v); if (!geoCache.has(c[0].toLowerCase() + '|')) geoCache.set(c[0].toLowerCase() + '|', v); }
+
   const SOURCES = [['er', 'EasyRecord'], ['wa', 'Webathletics'], ['tf', 'Track & Field'], ['ro', 'Roster Athletics']];
   const results = await Promise.allSettled([scrapeEasyRecord(), scrapeWebathletics(cityCoords, venues), scrapeTrackAndField(cityCoords), scrapeRoster(cityCoords)]);
-  let old = null; try { old = JSON.parse(await fs.readFile(OUT, 'utf8')); } catch {}
   const parts = results.map((r, i) => {
     if (r.status === 'fulfilled' && r.value.length) return r.value;
     const [src, label] = SOURCES[i];
@@ -365,6 +398,7 @@ async function main() {
   // samma tävling kan finnas på två plattformar: behåll den med flest anmälda
   const seen = new Map();
   for (const c of parts.flat()) {
+    c.co = c.co || 'SWE';
     const k = c.n.toLowerCase().replace(/[^a-zåäö0-9]/g, '') + '|' + c.d1 + '|' + c.c.toLowerCase();
     const n = c.e.reduce((s, e) => s + e[3], 0);
     if (!seen.has(k) || n > seen.get(k).n) seen.set(k, { c, n });
@@ -374,8 +408,9 @@ async function main() {
   if (comps.length < 3) throw new Error(`Bara ${comps.length} tävlingar hittades – troligen har en sida ändrat utseende. data.json lämnas orörd.`);
 
   comps.sort((a, b) => a.d1.localeCompare(b.d1) || a.n.localeCompare(b.n, 'sv'));
-  const names = new Set(cities.map(c => c[0]));
-  for (const c of comps) if (!names.has(c.c)) { cities.push([c.c, +c.la.toFixed(3), +c.lo.toFixed(3)]); names.add(c.c); }
+  // orter: svenska utan landskod (som förut), utländska med landskod som fjärde värde
+  const names = new Set(cities.map(c => c[0] + '|SWE'));
+  for (const c of comps) if (!names.has(c.c + '|' + c.co)) { const row = [c.c, +c.la.toFixed(3), +c.lo.toFixed(3)]; if (c.co !== 'SWE') row.push(c.co); cities.push(row); names.add(c.c + '|' + c.co); }
 
   const data = { updated: today, comps, cities };
   await fs.writeFile(OUT, JSON.stringify(data));
