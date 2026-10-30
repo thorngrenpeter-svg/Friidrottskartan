@@ -57,6 +57,10 @@ export function splitEvent(n) {
   if (/^kvinnor$/i.test(cls)) cls = 'K';
   if (/^män$/i.test(cls)) cls = 'M';
   cls = cls.replace(/^([A-ZÅÄÖ]+)\s+(\d+)$/, '$1$2');
+  // veteraner utan åldersgrupp -> KV / MV (sidan matchar t.ex. K45 mot KV)
+  if (/^(mix\s+)?veteraner\s+kvinnor$|^k\s?vet(eraner)?$/i.test(cls)) cls = 'KV';
+  else if (/^(mix\s+)?veteraner\s+män$|^m\s?vet(eraner)?$/i.test(cls)) cls = 'MV';
+  else if (/^veteraner$/i.test(cls)) cls = 'KV MV';
   if (!cls) cls = 'Öppen';
   return [cls, d];
 }
@@ -342,9 +346,9 @@ async function scrapeRoster(cityCoords) {
           const g = ev.gender === 'Mixed' ? gender[p.athleteIdFk] : ev.gender;
           let cls;
           const age = yob[p.athleteIdFk] ? year - yob[p.athleteIdFk] : 0;
-          if (age >= 7 && age <= 99) cls = age >= 20 ? (g === 'Female' ? 'K' : 'M') : (g === 'Female' ? 'F' : 'P') + (age <= 15 ? age : age <= 17 ? 17 : 19);
+          if (age >= 7 && age <= 110) cls = age >= 35 ? (g === 'Female' ? 'K' : 'M') + Math.min(90, Math.floor(age / 5) * 5) : age >= 20 ? (g === 'Female' ? 'K' : 'M') : (g === 'Female' ? 'F' : 'P') + (age <= 15 ? age : age <= 17 ? 17 : 19);
           else if (a.category === 'Meeting' && a.rangeStart > 0 && a.rangeStart === a.rangeEnd) cls = (g === 'Female' ? 'F' : 'P') + a.rangeStart;
-          else if (/vet/i.test(ev.label || '')) cls = g === 'Female' ? 'Veteraner Kvinnor' : 'Veteraner Män';
+          else if (/vet/i.test(ev.label || '')) cls = g === 'Female' ? 'KV' : 'MV';
           else if (/^[FPKM]\d{0,2}$/.test(a.name || '')) cls = a.name;
           else cls = g === 'Female' ? 'K' : 'M';
           const raw = p.initialPersonalBest;

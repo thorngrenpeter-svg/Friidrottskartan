@@ -210,15 +210,24 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 Promise.all(['geo.json','data.json?v='+Date.now()].map(u=>fetch(u).then(r=>{if(!r.ok)throw new Error(u);return r.json();})))
 .then(([GEO,D])=>{
 const FIELD=['Höjd','Stav','Längd','Tresteg','Kula','Diskus','Spjut','Slägga','Viktkastning','Boll'];
-const DISCS=['60 m','100 m','200 m','400 m','600 m','800 m','1 000 m','1 500 m','3 000 m','5 000 m','60 m häck','Höjd','Stav','Längd','Tresteg','Kula','Diskus','Spjut','Slägga','Viktkastning'];
-const CLASSES=['F7','F8','F9','F10','F11','F12','F13','F14','F15','F17','F19','K','P7','P8','P9','P10','P11','P12','P13','P14','P15','P17','P19','M'];
+const DISCS=['60 m','100 m','200 m','300 m','400 m','600 m','800 m','1 000 m','1 500 m','3 000 m','5 000 m','10 000 m','60 m häck','80 m häck','100 m häck','110 m häck','200 m häck','300 m häck','400 m häck','2 000 m hinder','3 000 m hinder','Höjd','Stav','Längd','Tresteg','Kula','Diskus','Spjut','Slägga','Viktkastning'];
+const YTH=[7,8,9,10,11,12,13,14,15,17,19], VET=[35,40,45,50,55,60,65,70,75,80,85,90];
+const CLASS_GROUPS=[['Flickor',YTH.map(n=>'F'+n)],['Pojkar',YTH.map(n=>'P'+n)],['Seniorer',['K','M']],['Veteraner kvinnor',VET.map(n=>'K'+n)],['Veteraner män',VET.map(n=>'M'+n)]];
+const CLASSES=CLASS_GROUPS.flatMap(g=>g[1]);
+// klassnamn från källorna -> gemensamma koder (KV/MV = veteraner, alla åldrar)
+function normCls(s){ s=String(s).trim();
+  if(/^(mix\s+)?veteraner\s+kvinnor$|^k\s?vet(eraner)?$|^kv$/i.test(s)) return 'KV';
+  if(/^(mix\s+)?veteraner\s+män$|^m\s?vet(eraner)?$|^mv$/i.test(s)) return 'MV';
+  if(/^veteraner$/i.test(s)) return 'KV MV';
+  return s.replace(/^([KM])\s+(\d{2})$/,'$1$2'); }
+const clsLabel=c=>({KV:'Veteraner kvinnor',MV:'Veteraner män','KV MV':'Veteraner'})[c]||c;
 const MON=['jan','feb','mar','apr','maj','jun','jul','aug','sep','okt','nov','dec'];
 const isField=d=>FIELD.includes(d)||d==='1 timme';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 
-D.comps.forEach((c,i)=>{c.idx=i;c.co=c.co||'SWE';c.key=c.la.toFixed(3)+','+c.lo.toFixed(3)});
+D.comps.forEach((c,i)=>{c.idx=i;c.co=c.co||'SWE';c.e.forEach(e=>{e[0]=normCls(e[0])});c.key=c.la.toFixed(3)+','+c.lo.toFixed(3)});
 D.cities.forEach(c=>{c[3]=c[3]||'SWE'});
 /* ---------- länder ---------- */
 const ISO3=Object.fromEntries('ABWAW AFGAF AGOAO AIAAI ALAAX ALBAL ANDAD AREAE ARGAR ARMAM ASMAS ATAAQ ATFTF ATGAG AUSAU AUTAT AZEAZ BDIBI BELBE BENBJ BESBQ BFABF BGDBD BGRBG BHRBH BHSBS BIHBA BLMBL BLRBY BLZBZ BMUBM BOLBO BRABR BRBBB BRNBN BTNBT BVTBV BWABW CAFCF CANCA CCKCC CHECH CHLCL CHNCN CIVCI CMRCM CODCD COGCG COKCK COLCO COMKM CPVCV CRICR CUBCU CUWCW CXRCX CYMKY CYPCY CZECZ DEUDE DJIDJ DMADM DNKDK DOMDO DZADZ ECUEC EGYEG ERIER ESHEH ESPES ESTEE ETHET FINFI FJIFJ FLKFK FRAFR FROFO FSMFM GABGA GBRGB GEOGE GGYGG GHAGH GIBGI GINGN GLPGP GMBGM GNBGW GNQGQ GRCGR GRDGD GRLGL GTMGT GUFGF GUMGU GUYGY HKGHK HMDHM HNDHN HRVHR HTIHT HUNHU IDNID IMNIM INDIN IOTIO IRLIE IRNIR IRQIQ ISLIS ISRIL ITAIT JAMJM JEYJE JORJO JPNJP KAZKZ KENKE KGZKG KHMKH KIRKI KNAKN KORKR KWTKW LAOLA LBNLB LBRLR LBYLY LCALC LIELI LKALK LSOLS LTULT LUXLU LVALV MACMO MAFMF MARMA MCOMC MDAMD MDGMG MDVMV MEXMX MHLMH MKDMK MLIML MLTMT MMRMM MNEME MNGMN MNPMP MOZMZ MRTMR MSRMS MTQMQ MUSMU MWIMW MYSMY MYTYT NAMNA NCLNC NERNE NFKNF NGANG NICNI NIUNU NLDNL NORNO NPLNP NRUNR NZLNZ OMNOM PAKPK PANPA PCNPN PERPE PHLPH PLWPW PNGPG POLPL PRIPR PRKKP PRTPT PRYPY PSEPS PYFPF QATQA REURE ROURO RUSRU RWARW SAUSA SDNSD SENSN SGPSG SGSGS SHNSH SJMSJ SLBSB SLESL SLVSV SMRSM SOMSO SPMPM SRBRS SSDSS STPST SURSR SVKSK SVNSI SWESE SWZSZ SXMSX SYCSC SYRSY TCATC TCDTD TGOTG THATH TJKTJ TKLTK TKMTM TLSTL TONTO TTOTT TUNTN TURTR TUVTV TWNTW TZATZ UGAUG UKRUA UMIUM URYUY USAUS UZBUZ VATVA VCTVC VENVE VGBVG VIRVI VNMVN VUTVU WLFWF WSMWS XKKXK YEMYE ZAFZA ZMBZM ZWEZW'.split(' ').map(x=>[x.slice(0,3),x.slice(3)]));
@@ -243,7 +252,8 @@ const SRC={
   tf:c=>({name:'Track & Field', list:'https://www.trackandfield.se/Home/Competition?comp='+c.id, info:'https://www.trackandfield.se/CompInfo?comp='+c.id, lt:'Startlista'}),
   ro:c=>({name:'Roster Athletics', list:'https://meets.rosterathletics.com/public/meeting/'+c.id+'/details', lt:'Tävlingssida'})};
 const srcLink=c=>(SRC[c.s]||SRC.wa)(c);
-const clsMatch=(evCls,my)=> evCls.split(' ').includes(my);
+const clsMatch=(evCls,my)=>{ const p=evCls.split(' '); if(p.includes(my)) return true;
+  const v=my.match(/^([KM])(\d{2})$/); return !!(v && +v[2]>=35 && p.includes(v[1]+'V')); };
 
 /* ---------- state ---------- */
 const saved=store.get('fk-state',{});
@@ -426,7 +436,7 @@ function paneDetail(c){
    +'<div class="links"><a href="'+L.list+'" target="_blank" rel="noopener">'+L.lt+' på '+L.name+' ↗</a>'+(L.info?'<a href="'+L.info+'" target="_blank" rel="noopener">Info & anmälan ↗</a>':'')+'</div>';
   if(!c.e.length) h+='<p class="empty">Inga anmälda individuella grenar ännu, eller bara mångkamp. Se '+L.name+' för grenprogram.</p>';
   byCls.forEach(([cls,evs])=>{ const mine=clsMatch(cls,profile.cls);
-    h+='<div class="clsh">'+esc(cls)+(mine?' <span class="tag you">din klass</span>':'')+'</div>';
+    h+='<div class="clsh">'+esc(clsLabel(cls))+(mine?' <span class="tag you">din klass</span>':'')+'</div>';
     evs.forEach(ev=>{ const my=mine?myPB()[ev[1]]:0; let badge='';
       if(my>0){ const r=rankIn(ev,my); badge=' · <b style="color:var(--you)">du '+r.place+':a av '+(r.withPB+1)+'</b>'; }
       h+='<details class="ev"'+(mine?' open':'')+'><summary><span>'+esc(ev[1])+(ev[2]?' <span class="meta">'+ev[2].slice(5)+'</span>':'')+'</span><span class="n">'+ev[3]+(ev[3]===1?' anmäld':' anmälda')+badge+'</span></summary>'+startlistHTML(ev,c)+'</details>';});
@@ -437,9 +447,9 @@ function paneDetail(c){
 function panePB(list){
   const pb=myPB();
   let h='<div class="pbform"><p class="note'+(isExample?' ex':'')+'">'+(isExample?'Exempelvärden visas. Välj din klass och skriv in dina egna PB, så jämförs du med alla som anmält sig.':'Dina PB sparas bara i den här webbläsaren.')+'</p>'
-   +'<div class="field"><label for="pbcls">Åldersklass</label><select id="pbcls">'+CLASSES.map(c=>'<option'+(c===profile.cls?' selected':'')+'>'+c+'</option>').join('')+'</select></div>'
+   +'<div class="field"><label for="pbcls">Åldersklass</label><select id="pbcls">'+CLASS_GROUPS.map(([gl,cs])=>'<optgroup label="'+gl+'">'+cs.map(c=>'<option'+(c===profile.cls?' selected':'')+'>'+c+'</option>').join('')+'</optgroup>').join('')+'</select></div>'
    +'<div class="pbgrid">'+DISCS.map((d,i)=>{ const n=D.comps.reduce((a,c)=>a+c.e.filter(e=>e[1]===d&&clsMatch(e[0],profile.cls)).reduce((x,e)=>x+e[3],0),0);
-      return '<div class="field"><label for="pb'+i+'">'+esc(d)+(n?' <span>'+n+' anm.</span>':'')+'</label><input id="pb'+i+'" data-d="'+esc(d)+'" inputmode="decimal" placeholder="'+(isField(d)?'m, t.ex. 4,20':(['800 m','1 000 m','1 500 m','3 000 m','5 000 m','600 m'].includes(d)?'t.ex. 2:31,40':'sek, t.ex. 9,12'))+'" value="'+(pb[d]?fmtMark(pb[d],d).replace(' m',''):'')+'"></div>';}).join('')+'</div>'
+      return '<div class="field"><label for="pb'+i+'">'+esc(d)+(n?' <span>'+n+' anm.</span>':'')+'</label><input id="pb'+i+'" data-d="'+esc(d)+'" inputmode="decimal" placeholder="'+(isField(d)?'m, t.ex. 4,20':(['800 m','1 000 m','1 500 m','3 000 m','5 000 m','10 000 m','600 m','2 000 m hinder','3 000 m hinder'].includes(d)?'t.ex. 2:31,40':'sek, t.ex. 9,12'))+'" value="'+(pb[d]?fmtMark(pb[d],d).replace(' m',''):'')+'"></div>';}).join('')+'</div>'
    +'<div style="display:flex;gap:8px"><button class="btn" type="button" id="pbsave">Spara och jämför</button>'+(isExample?'':'<button class="btn ghost" type="button" id="pbclear">Töm klassens PB</button>')+'</div></div>';
   // ranking list
   const rows=[]; list.forEach(c=>myEvents(c).forEach(ev=>{ const r=rankIn(ev,pb[ev[1]]); rows.push({c,ev,r}); }));
