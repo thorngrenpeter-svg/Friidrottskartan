@@ -58,7 +58,9 @@ export function splitEvent(n) {
   if (/^män$/i.test(cls)) cls = 'M';
   cls = cls.replace(/^([A-ZÅÄÖ]+)\s+(\d+)$/, '$1$2');
   // veteraner utan åldersgrupp -> KV / MV (sidan matchar t.ex. K45 mot KV)
-  if (/^(mix\s+)?veteraner\s+kvinnor$|^k\s?vet(eraner)?$/i.test(cls)) cls = 'KV';
+  // handikappklasser (t.ex. "Öppen klass Para", T44) samlas som Para
+  if (/para|handikapp|funktionsneds|rörelsehind|synskad|intellektuell|\bT(1[1-3]|20|3[1-8]|4[0-7]|5[1-4]|6[1-4])\b/i.test(cls)) cls = 'Para';
+  else if (/^(mix\s+)?veteraner\s+kvinnor$|^k\s?vet(eraner)?$/i.test(cls)) cls = 'KV';
   else if (/^(mix\s+)?veteraner\s+män$|^m\s?vet(eraner)?$/i.test(cls)) cls = 'MV';
   else if (/^veteraner$/i.test(cls)) cls = 'KV MV';
   if (!cls) cls = 'Öppen';
@@ -345,8 +347,10 @@ async function scrapeRoster(cityCoords) {
           if (!p || p.startStatus === 'Scratched' || p.startStatus === 'DNS') continue;
           const g = ev.gender === 'Mixed' ? gender[p.athleteIdFk] : ev.gender;
           let cls;
+          const para = /para|handikapp|funktionsneds|rörelsehind|synskad|intellektuell|\bT(1[1-3]|20|3[1-8]|4[0-7]|5[1-4]|6[1-4])\b/i.test((ev.label || '') + ' ' + (a.name || ''));
           const age = yob[p.athleteIdFk] ? year - yob[p.athleteIdFk] : 0;
-          if (age >= 7 && age <= 110) cls = age >= 35 ? (g === 'Female' ? 'K' : 'M') + Math.min(90, Math.floor(age / 5) * 5) : age >= 20 ? (g === 'Female' ? 'K' : 'M') : (g === 'Female' ? 'F' : 'P') + (age <= 15 ? age : age <= 17 ? 17 : 19);
+          if (para) cls = 'Para';
+          else if (age >= 7 && age <= 110) cls = age >= 35 ? (g === 'Female' ? 'K' : 'M') + Math.min(90, Math.floor(age / 5) * 5) : age >= 20 ? (g === 'Female' ? 'K' : 'M') : (g === 'Female' ? 'F' : 'P') + (age <= 15 ? age : age <= 17 ? 17 : 19);
           else if (a.category === 'Meeting' && a.rangeStart > 0 && a.rangeStart === a.rangeEnd) cls = (g === 'Female' ? 'F' : 'P') + a.rangeStart;
           else if (/vet/i.test(ev.label || '')) cls = g === 'Female' ? 'KV' : 'MV';
           else if (/^[FPKM]\d{0,2}$/.test(a.name || '')) cls = a.name;
