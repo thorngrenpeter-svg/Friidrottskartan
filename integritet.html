@@ -15,8 +15,8 @@
 @font-face{font-family:"Saira Condensed";font-weight:700;font-display:swap;src:url(saira-condensed-latin-700-normal.woff2) format("woff2")}
 @font-face{font-family:"Public Sans";font-weight:400;font-display:swap;src:url(public-sans-latin-400-normal.woff2) format("woff2")}
 @font-face{font-family:"Public Sans";font-weight:600;font-display:swap;src:url(public-sans-latin-600-normal.woff2) format("woff2")}
-:root{--bg:#f3f6f8;--panel:#fff;--ink:#15212c;--muted:#5b6b78;--line:#d8e0e6;--track:#2357b8;color-scheme:light}
-@media (prefers-color-scheme: dark){:root{--bg:#0f161d;--panel:#16202a;--ink:#e6edf2;--muted:#93a4b2;--line:#2a3743;--track:#6f9cf0;color-scheme:dark}}
+:root{--bg:#f3f6f8;--panel:#fff;--ink:#15212c;--muted:#5b6b78;--line:#d8e0e6;--track:#2357b8;--soft:#e3ebf8;color-scheme:light}
+@media (prefers-color-scheme: dark){:root{--bg:#0f161d;--panel:#16202a;--ink:#e6edf2;--muted:#93a4b2;--line:#2a3743;--track:#6f9cf0;--soft:#1d2d47;color-scheme:dark}}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 "Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
 main{max-width:680px;margin:0 auto;padding:24px max(16px,env(safe-area-inset-right,0px)) 48px max(16px,env(safe-area-inset-left,0px))}
 h1,h2{font-family:"Saira Condensed","Arial Narrow",sans-serif;font-weight:700;line-height:1.1;text-wrap:balance}
@@ -24,43 +24,110 @@ h1{font-size:36px;margin:16px 0 8px}
 h2{font-size:22px;margin:28px 0 6px;text-transform:uppercase;letter-spacing:.03em}
 a{color:var(--track)}
 .muted{color:var(--muted)}
-.logo img{height:44px;width:auto}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.logo img{height:44px;width:auto;display:block}
 .logo .d{display:none}
-@media (prefers-color-scheme: dark){.logo .l{display:none}.logo .d{display:inline}}
+@media (prefers-color-scheme: dark){.logo .l{display:none}.logo .d{display:block}}
 ul{padding-left:20px}
+.langsel{position:relative}
+#langbtn{display:flex;align-items:center;gap:6px;height:32px;padding:0 10px;border:1px solid var(--line);border-radius:7px;background:var(--panel);color:var(--ink);cursor:pointer;font:600 13px "Public Sans",system-ui,sans-serif}
+.flag{border-radius:2px;box-shadow:0 0 0 1px rgba(0,0,0,.14);display:block}
+.langmenu{position:absolute;right:0;top:calc(100% + 4px);z-index:5;background:var(--panel);border:1px solid var(--line);border-radius:9px;box-shadow:0 10px 28px rgba(0,0,0,.16);padding:4px;min-width:170px;display:flex;flex-direction:column}
+.langmenu[hidden]{display:none}
+.langmenu button{display:flex;align-items:center;gap:10px;padding:9px 10px;border:0;background:none;border-radius:6px;cursor:pointer;text-align:left;color:var(--ink);font:inherit;font-size:15px}
+.langmenu button:hover{background:var(--soft)}
 </style>
 </head>
 <body>
 <main>
-  <a class="logo" href="./"><img class="l" src="logo.png" alt="Friidrottskartan"><img class="d" src="logo-dark.png" alt="Friidrottskartan"></a>
-  <h1>Integritet</h1>
-  <p class="muted">Senast ändrad 30 oktober 2026</p>
-
-  <h2>Kort sagt</h2>
-  <p>Friidrottskartan visar inga namn, klubbar eller födelseår. Vi samlar inte in något som kan kopplas till dig som besökare: inga konton och inga cookies. Vi mäter antal besök anonymt med Plausible.</p>
-
-  <h2>Vilken information visas?</h2>
-  <p>Sidan hämtar varje natt kommande tävlingar från <a href="https://easyrecord.se/" target="_blank" rel="noopener">EasyRecord</a>, <a href="https://webathletics.se/" target="_blank" rel="noopener">Webathletics</a>, <a href="https://www.trackandfield.se/" target="_blank" rel="noopener">Track &amp; Field</a> och <a href="https://meets.rosterathletics.com/public/competitions" target="_blank" rel="noopener">Roster Athletics</a>. Från deras startlistor sparar vi bara:</p>
-  <ul>
-    <li>tävlingens namn, datum, arena, ort, arrangör och sista anmälningsdag</li>
-    <li>antal anmälda per klass och gren</li>
-    <li>de anmäldas personbästa (PB) som en anonym, sorterad lista</li>
-  </ul>
-  <p>Namn, klubb, födelseår och startnummer sparas aldrig. För tävlingar hos Roster Athletics används de anmäldas födelseår bara i stunden för att räkna fram åldersklass (till exempel P13), och sparas inte. För orter utanför Sverige slås kartpunkten upp i <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>; det sker när datan hämtas, inte när du besöker sidan. Vill du se vem som är anmäld länkar varje tävling till startlistan hos källan.</p>
-
-  <h2>Dina egna PB</h2>
-  <p>De PB du skriver in under "Mina PB" sparas bara i din egen webbläsare (local storage) och skickas aldrig till oss eller någon annan. Du tar bort dem genom att tömma fälten eller rensa webbplatsdata i webbläsaren.</p>
-
-  <h2>Besöksstatistik</h2>
-  <p>Vi använder <a href="https://plausible.io/data-policy" target="_blank" rel="noopener">Plausible Analytics</a> för att se hur många som besöker sidan, ungefär varifrån (land och region), vilken typ av enhet som används och vilken sida man kom ifrån. Vi räknar också några händelser utan koppling till person: vilken ort som söks, klick vidare till källsidorna och att PB sparas (bara åldersklassen, aldrig själva resultaten). Plausible använder inga cookies, sparar inga IP-adresser och kan inte känna igen dig mellan besök eller mellan webbplatser. Statistiken lagras i EU och visas bara som sammanräknade siffror.</p>
-
-  <h2>Teknik och tredje part</h2>
-  <p>Webbplatsen ligger på GitHub Pages. GitHub behandlar tekniska uppgifter som IP-adress i sina serverloggar för att kunna leverera sidan och skydda tjänsten, enligt <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHubs integritetspolicy</a>. Typsnitt, kartbibliotek och data laddas från samma server. Utöver GitHub och Plausible (se ovan) får inga andra tjänster uppgifter om ditt besök.</p>
-
-  <h2>Kontakt</h2>
-  <p>Har du frågor, eller vill du att något tas bort eller rättas? Mejla <strong>spring@friidrottskartan.se</strong>. Om du anser att vi hanterar personuppgifter felaktigt har du rätt att klaga hos <a href="https://www.imy.se/" target="_blank" rel="noopener">Integritetsskyddsmyndigheten (IMY)</a>.</p>
-
-  <p><a href="./">← Tillbaka till kartan</a></p>
+  <div class="top">
+    <a class="logo" href="./"><img class="l" src="logo.png" alt="Friidrottskartan"><img class="d" src="logo-dark.png" alt="Friidrottskartan"></a>
+    <div class="langsel"><button type="button" id="langbtn" aria-haspopup="true" aria-expanded="false"></button><div id="langmenu" class="langmenu" hidden></div></div>
+  </div>
+  <div id="content"></div>
 </main>
+<script src="i18n.js"></script>
+<script>
+const SRC='<a href="https://easyrecord.se/" target="_blank" rel="noopener">EasyRecord</a>, <a href="https://webathletics.se/" target="_blank" rel="noopener">Webathletics</a>, <a href="https://www.trackandfield.se/" target="_blank" rel="noopener">Track &amp; Field</a> {and} <a href="https://meets.rosterathletics.com/public/competitions" target="_blank" rel="noopener">Roster Athletics</a>';
+const PL='<a href="https://plausible.io/data-policy" target="_blank" rel="noopener">Plausible Analytics</a>';
+const GH='<a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" target="_blank" rel="noopener">GitHub</a>';
+const FS='<a href="https://formsubmit.co/" target="_blank" rel="noopener">FormSubmit</a>';
+const OSM='<a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a>';
+const MAIL='<strong>spring@friidrottskartan.se</strong>';
+const T={
+sv:{title:'Integritet',date:'Senast ändrad 31 oktober 2026',back:'← Tillbaka till kartan',body:`
+<h2>Kort sagt</h2><p>Friidrottskartan visar inga namn, klubbar eller födelseår för idrottare. Du behöver inget konto, och vi använder inga cookies. Vi mäter antal besök anonymt med Plausible. Personuppgifter tar vi bara emot om du själv anmäler dig till nyhetsbrevet.</p>
+<h2>Vilken information visas?</h2><p>Sidan hämtar varje natt kommande tävlingar från ${SRC.replace('{and}','och')}. Från deras startlistor sparar vi bara:</p>
+<ul><li>tävlingens namn, datum, arena, ort, arrangör och sista anmälningsdag</li><li>antal anmälda per klass och gren</li><li>de anmäldas personbästa (PB) som en anonym, sorterad lista</li></ul>
+<p>Namn, klubb, födelseår och startnummer sparas aldrig. För tävlingar hos Roster Athletics används de anmäldas födelseår bara i stunden för att räkna fram åldersklass (till exempel P13), och sparas inte. För orter utanför Sverige slås kartpunkten upp i ${OSM}; det sker när datan hämtas, inte när du besöker sidan. Vill du se vem som är anmäld länkar varje tävling till startlistan hos källan.</p>
+<h2>Din klass, dina PB och favoriter</h2><p>Klassen du väljer, de PB du skriver in under "Mina PB" och de tävlingar du stjärnmarkerar sparas bara i din egen webbläsare (local storage). De skickas aldrig till oss eller någon annan. Du tar bort dem genom att tömma fälten, avmarkera stjärnorna eller rensa webbplatsdata i webbläsaren.</p>
+<h2>Kalender</h2><p>Om du lägger till en tävling i Google Kalender eller Outlook öppnas deras sida med tävlingens namn, datum och plats ifyllda. Då gäller Googles respektive Microsofts villkor. En .ics-fil skapas direkt i din webbläsare och skickas inte via oss.</p>
+<h2 id="nyhetsbrev">Nyhetsbrev</h2><p>Om du anmäler dig till nyhetsbrevet tar vi emot ditt förnamn, efternamn, e-postadress och, om du vill, din klubb. Uppgifterna används bara för att skicka nyheter och tävlingstips från Friidrottskartan. Vi behandlar dem med stöd av ditt samtycke (artikel 6.1 a i dataskyddsförordningen) och sparar dem tills du avslutar prenumerationen.</p>
+<p>Formuläret skickas via tjänsten ${FS} som vidarebefordrar det som ett mejl till ${MAIL}. Mejlet förvaras i vår e-post hos Loopia. Vi säljer eller lämnar aldrig ut uppgifterna. Du kan när som helst avsluta prenumerationen, få veta vilka uppgifter vi har om dig eller be oss radera dem genom att mejla ${MAIL}.</p>
+<h2>Besöksstatistik</h2><p>Vi använder ${PL} för att se hur många som besöker sidan, ungefär varifrån (land och region), vilken typ av enhet som används och vilken sida man kom ifrån. Vi räknar också några händelser utan koppling till person, till exempel vilken ort som söks, vilken klass som väljs, klick vidare till källorna, sparade favoriter och kalenderklick. Själva PB-värdena skickas aldrig. Plausible använder inga cookies, sparar inga IP-adresser och kan inte känna igen dig mellan besök. Statistiken lagras i EU och visas bara som sammanräknade siffror.</p>
+<h2>Teknik och tredje part</h2><p>Webbplatsen ligger på GitHub Pages. ${GH} behandlar tekniska uppgifter som IP-adress i sina serverloggar för att kunna leverera sidan och skydda tjänsten. Typsnitt, kartor och data laddas från samma server. Utöver GitHub, Plausible och, om du anmäler dig till nyhetsbrevet, FormSubmit får inga andra tjänster uppgifter om ditt besök.</p>
+<h2>Kontakt</h2><p>Har du frågor, eller vill du att något tas bort eller rättas? Mejla ${MAIL}. Om du anser att vi hanterar personuppgifter felaktigt har du rätt att klaga hos <a href="https://www.imy.se/" target="_blank" rel="noopener">Integritetsskyddsmyndigheten (IMY)</a>.</p>`},
+en:{title:'Privacy',date:'Last updated 31 October 2026',back:'← Back to the map',body:`
+<h2>In short</h2><p>Friidrottskartan does not show athletes’ names, clubs or years of birth. You don’t need an account, and we use no cookies. We count visits anonymously with Plausible. We only receive personal data if you sign up for the newsletter yourself.</p>
+<h2>What information is shown?</h2><p>Every night the site collects upcoming meets from ${SRC.replace('{and}','and')}. From their start lists we only store:</p>
+<ul><li>the meet’s name, date, venue, town, organiser and entry deadline</li><li>the number of entries per class and event</li><li>the entered athletes’ personal bests (PB) as an anonymous, sorted list</li></ul>
+<p>Names, clubs, years of birth and bib numbers are never stored. For meets on Roster Athletics, the athletes’ year of birth is only used momentarily to work out the age class (for example P13) and is not stored. For towns outside Sweden, the map point is looked up in ${OSM} when the data is collected, not when you visit the site. To see who is entered, each meet links to the start list at the source.</p>
+<h2>Your class, your PBs and favourites</h2><p>The class you choose, the PBs you enter under “My PBs” and the meets you star are stored only in your own browser (local storage). They are never sent to us or anyone else. You remove them by clearing the fields, un-starring the meets or clearing site data in your browser.</p>
+<h2>Calendar</h2><p>If you add a meet to Google Calendar or Outlook, their website opens with the meet’s name, date and place filled in. Google’s or Microsoft’s terms then apply. An .ics file is created directly in your browser and is not sent via us.</p>
+<h2 id="nyhetsbrev">Newsletter</h2><p>If you sign up for the newsletter we receive your first name, last name, email address and, if you like, your club. The details are only used to send news and meet tips from Friidrottskartan. We process them on the basis of your consent (Article 6(1)(a) GDPR) and keep them until you unsubscribe.</p>
+<p>The form is sent via the service ${FS}, which forwards it as an email to ${MAIL}. The email is kept in our mailbox at Loopia. We never sell or share the details. You can unsubscribe at any time, ask what data we hold about you or ask us to delete it by emailing ${MAIL}.</p>
+<h2>Visitor statistics</h2><p>We use ${PL} to see how many people visit the site, roughly where from (country and region), what type of device is used and which page they came from. We also count a few events with no link to any person, such as which town is searched, which class is chosen, clicks to the sources, saved favourites and calendar clicks. PB values are never sent. Plausible uses no cookies, stores no IP addresses and cannot recognise you between visits. The statistics are stored in the EU and only shown as totals.</p>
+<h2>Technology and third parties</h2><p>The website is hosted on GitHub Pages. ${GH} processes technical data such as IP addresses in its server logs to deliver the site and protect the service. Fonts, maps and data are loaded from the same server. Apart from GitHub, Plausible and – if you sign up for the newsletter – FormSubmit, no other services receive information about your visit.</p>
+<h2>Contact</h2><p>Questions, or want something removed or corrected? Email ${MAIL}. If you believe we handle personal data incorrectly, you have the right to complain to the Swedish Authority for Privacy Protection (<a href="https://www.imy.se/en/" target="_blank" rel="noopener">IMY</a>).</p>`},
+de:{title:'Datenschutz',date:'Zuletzt geändert am 31. Oktober 2026',back:'← Zurück zur Karte',body:`
+<h2>Kurz gesagt</h2><p>Friidrottskartan zeigt keine Namen, Vereine oder Geburtsjahre von Athletinnen und Athleten. Du brauchst kein Konto, und wir verwenden keine Cookies. Besuche zählen wir anonym mit Plausible. Personenbezogene Daten erhalten wir nur, wenn du dich selbst für den Newsletter anmeldest.</p>
+<h2>Welche Informationen werden angezeigt?</h2><p>Die Seite holt jede Nacht kommende Wettkämpfe von ${SRC.replace('{and}','und')}. Aus deren Startlisten speichern wir nur:</p>
+<ul><li>Name, Datum, Wettkampfstätte, Ort, Veranstalter und Meldeschluss des Wettkampfs</li><li>die Anzahl der Meldungen pro Klasse und Disziplin</li><li>die Bestleistungen (PB) der Gemeldeten als anonyme, sortierte Liste</li></ul>
+<p>Namen, Vereine, Geburtsjahre und Startnummern werden nie gespeichert. Bei Wettkämpfen auf Roster Athletics wird das Geburtsjahr nur kurz verwendet, um die Altersklasse (z. B. P13) zu bestimmen, und nicht gespeichert. Für Orte außerhalb Schwedens wird der Kartenpunkt bei ${OSM} nachgeschlagen – beim Abruf der Daten, nicht bei deinem Besuch. Wer gemeldet ist, siehst du über den Link zur Startliste bei der Quelle.</p>
+<h2>Deine Klasse, deine PBs und Favoriten</h2><p>Die gewählte Klasse, die unter „Meine PBs“ eingetragenen Bestleistungen und die mit Stern markierten Wettkämpfe werden nur in deinem eigenen Browser gespeichert (Local Storage). Sie werden nie an uns oder andere gesendet. Du löschst sie, indem du die Felder leerst, die Sterne entfernst oder die Websitedaten im Browser löschst.</p>
+<h2>Kalender</h2><p>Wenn du einen Wettkampf zu Google Kalender oder Outlook hinzufügst, öffnet sich deren Seite mit Name, Datum und Ort des Wettkampfs. Dann gelten die Bedingungen von Google bzw. Microsoft. Eine .ics-Datei wird direkt in deinem Browser erstellt und nicht über uns gesendet.</p>
+<h2 id="nyhetsbrev">Newsletter</h2><p>Wenn du dich für den Newsletter anmeldest, erhalten wir deinen Vornamen, Nachnamen, deine E-Mail-Adresse und auf Wunsch deinen Verein. Die Angaben werden nur verwendet, um Neuigkeiten und Wettkampftipps von Friidrottskartan zu senden. Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Wir speichern die Daten, bis du dich abmeldest.</p>
+<p>Das Formular wird über den Dienst ${FS} gesendet, der es als E-Mail an ${MAIL} weiterleitet. Die E-Mail wird in unserem Postfach bei Loopia aufbewahrt. Wir verkaufen oder teilen die Daten nie. Du kannst dich jederzeit abmelden, Auskunft über deine Daten verlangen oder sie löschen lassen – schreib einfach an ${MAIL}.</p>
+<h2>Besucherstatistik</h2><p>Wir verwenden ${PL}, um zu sehen, wie viele Menschen die Seite besuchen, ungefähr woher (Land und Region), welcher Gerätetyp genutzt wird und von welcher Seite man kam. Außerdem zählen wir einige Ereignisse ohne Personenbezug, etwa welcher Ort gesucht, welche Klasse gewählt wird, Klicks zu den Quellen, gespeicherte Favoriten und Kalenderklicks. PB-Werte werden nie gesendet. Plausible verwendet keine Cookies, speichert keine IP-Adressen und kann dich zwischen Besuchen nicht wiedererkennen. Die Statistik wird in der EU gespeichert und nur als Summen angezeigt.</p>
+<h2>Technik und Drittanbieter</h2><p>Die Website liegt bei GitHub Pages. ${GH} verarbeitet technische Daten wie IP-Adressen in Serverprotokollen, um die Seite auszuliefern und den Dienst zu schützen. Schriften, Karten und Daten werden vom selben Server geladen. Außer GitHub, Plausible und – bei Newsletter-Anmeldung – FormSubmit erhalten keine anderen Dienste Informationen über deinen Besuch.</p>
+<h2>Kontakt</h2><p>Fragen, oder soll etwas gelöscht oder berichtigt werden? Schreib an ${MAIL}. Wenn du meinst, dass wir personenbezogene Daten falsch verarbeiten, kannst du dich bei der schwedischen Datenschutzbehörde (<a href="https://www.imy.se/en/" target="_blank" rel="noopener">IMY</a>) beschweren.</p>`},
+fr:{title:'Confidentialité',date:'Dernière mise à jour : 31 octobre 2026',back:'← Retour à la carte',body:`
+<h2>En bref</h2><p>Friidrottskartan n’affiche ni les noms, ni les clubs, ni les années de naissance des athlètes. Aucun compte n’est nécessaire et nous n’utilisons pas de cookies. Nous comptons les visites de façon anonyme avec Plausible. Nous ne recevons des données personnelles que si tu t’inscris toi-même à la newsletter.</p>
+<h2>Quelles informations sont affichées ?</h2><p>Chaque nuit, le site récupère les compétitions à venir sur ${SRC.replace('{and}','et')}. De leurs listes de départ, nous ne conservons que :</p>
+<ul><li>le nom, la date, le stade, la ville, l’organisateur et la date limite d’inscription</li><li>le nombre d’inscrits par catégorie et par épreuve</li><li>les records personnels (RP) des inscrits sous forme de liste anonyme et triée</li></ul>
+<p>Les noms, clubs, années de naissance et dossards ne sont jamais conservés. Pour les compétitions sur Roster Athletics, l’année de naissance n’est utilisée qu’un instant pour déterminer la catégorie d’âge (par exemple P13) et n’est pas conservée. Pour les villes hors de Suède, le point sur la carte est recherché dans ${OSM} lors de la collecte des données, pas lors de ta visite. Pour voir qui est inscrit, chaque compétition renvoie vers la liste de départ de la source.</p>
+<h2>Ta catégorie, tes records et tes favoris</h2><p>La catégorie choisie, les records saisis dans « Mes records » et les compétitions marquées d’une étoile sont enregistrés uniquement dans ton navigateur (stockage local). Ils ne nous sont jamais envoyés, ni à personne d’autre. Tu peux les supprimer en vidant les champs, en retirant les étoiles ou en effaçant les données du site dans ton navigateur.</p>
+<h2>Agenda</h2><p>Si tu ajoutes une compétition à Google Agenda ou à Outlook, leur site s’ouvre avec le nom, la date et le lieu déjà remplis. Les conditions de Google ou de Microsoft s’appliquent alors. Un fichier .ics est créé directement dans ton navigateur et ne passe pas par nous.</p>
+<h2 id="nyhetsbrev">Newsletter</h2><p>Si tu t’inscris à la newsletter, nous recevons ton prénom, ton nom, ton adresse e-mail et, si tu le souhaites, ton club. Ces données servent uniquement à envoyer des nouvelles et des idées de compétitions de Friidrottskartan. Nous les traitons sur la base de ton consentement (article 6, paragraphe 1, point a du RGPD) et les conservons jusqu’à ta désinscription.</p>
+<p>Le formulaire est envoyé via le service ${FS}, qui le transmet par e-mail à ${MAIL}. L’e-mail est conservé dans notre messagerie chez Loopia. Nous ne vendons ni ne partageons jamais ces données. Tu peux à tout moment te désinscrire, demander quelles données nous détenons ou demander leur suppression en écrivant à ${MAIL}.</p>
+<h2>Statistiques de visite</h2><p>Nous utilisons ${PL} pour savoir combien de personnes visitent le site, d’où elles viennent approximativement (pays et région), quel type d’appareil est utilisé et depuis quelle page elles arrivent. Nous comptons aussi quelques événements sans lien avec une personne, comme la ville recherchée, la catégorie choisie, les clics vers les sources, les favoris enregistrés et les clics vers l’agenda. Les valeurs des records ne sont jamais envoyées. Plausible n’utilise pas de cookies, ne conserve pas d’adresses IP et ne peut pas te reconnaître d’une visite à l’autre. Les statistiques sont stockées dans l’UE et affichées uniquement sous forme de totaux.</p>
+<h2>Technique et tiers</h2><p>Le site est hébergé sur GitHub Pages. ${GH} traite des données techniques comme l’adresse IP dans ses journaux de serveur pour fournir le site et protéger le service. Les polices, cartes et données sont chargées depuis le même serveur. Hormis GitHub, Plausible et, si tu t’inscris à la newsletter, FormSubmit, aucun autre service ne reçoit d’informations sur ta visite.</p>
+<h2>Contact</h2><p>Une question, ou tu veux faire supprimer ou corriger quelque chose ? Écris à ${MAIL}. Si tu estimes que nous traitons des données personnelles de façon incorrecte, tu peux déposer une plainte auprès de l’autorité suédoise de protection des données (<a href="https://www.imy.se/en/" target="_blank" rel="noopener">IMY</a>).</p>`},
+es:{title:'Privacidad',date:'Última modificación: 31 de octubre de 2026',back:'← Volver al mapa',body:`
+<h2>En resumen</h2><p>Friidrottskartan no muestra nombres, clubes ni años de nacimiento de los atletas. No necesitas cuenta y no usamos cookies. Contamos las visitas de forma anónima con Plausible. Solo recibimos datos personales si tú mismo te suscribes al boletín.</p>
+<h2>¿Qué información se muestra?</h2><p>Cada noche el sitio recopila las próximas competiciones de ${SRC.replace('{and}','y')}. De sus listas de salida solo guardamos:</p>
+<ul><li>el nombre, la fecha, el lugar, la ciudad, el organizador y la fecha límite de inscripción</li><li>el número de inscritos por categoría y prueba</li><li>las mejores marcas personales (MMP) de los inscritos como una lista anónima y ordenada</li></ul>
+<p>Nunca se guardan nombres, clubes, años de nacimiento ni dorsales. En las competiciones de Roster Athletics, el año de nacimiento solo se usa un momento para calcular la categoría de edad (por ejemplo P13) y no se guarda. Para ciudades fuera de Suecia, el punto del mapa se busca en ${OSM} al recopilar los datos, no cuando visitas el sitio. Para ver quién está inscrito, cada competición enlaza con la lista de salida de la fuente.</p>
+<h2>Tu categoría, tus marcas y favoritas</h2><p>La categoría que eliges, las marcas que introduces en «Mis marcas» y las competiciones que marcas con estrella se guardan solo en tu navegador (almacenamiento local). Nunca se envían a nosotros ni a nadie. Puedes borrarlas vaciando los campos, quitando las estrellas o borrando los datos del sitio en tu navegador.</p>
+<h2>Calendario</h2><p>Si añades una competición a Google Calendar u Outlook, se abre su web con el nombre, la fecha y el lugar ya rellenados. Entonces se aplican las condiciones de Google o Microsoft. El archivo .ics se crea directamente en tu navegador y no pasa por nosotros.</p>
+<h2 id="nyhetsbrev">Boletín</h2><p>Si te suscribes al boletín, recibimos tu nombre, apellido, correo electrónico y, si quieres, tu club. Los datos solo se usan para enviar noticias y consejos sobre competiciones de Friidrottskartan. Los tratamos con base en tu consentimiento (artículo 6.1.a del RGPD) y los conservamos hasta que te des de baja.</p>
+<p>El formulario se envía a través del servicio ${FS}, que lo reenvía como correo a ${MAIL}. El correo se guarda en nuestro buzón en Loopia. Nunca vendemos ni cedemos los datos. Puedes darte de baja en cualquier momento, preguntar qué datos tenemos sobre ti o pedir que los borremos escribiendo a ${MAIL}.</p>
+<h2>Estadísticas de visitas</h2><p>Usamos ${PL} para ver cuántas personas visitan el sitio, aproximadamente desde dónde (país y región), qué tipo de dispositivo usan y desde qué página llegaron. También contamos algunos eventos sin relación con ninguna persona, como la ciudad buscada, la categoría elegida, los clics hacia las fuentes, las favoritas guardadas y los clics al calendario. Los valores de las marcas nunca se envían. Plausible no usa cookies, no guarda direcciones IP y no puede reconocerte entre visitas. Las estadísticas se guardan en la UE y solo se muestran como totales.</p>
+<h2>Tecnología y terceros</h2><p>El sitio está alojado en GitHub Pages. ${GH} trata datos técnicos como la dirección IP en sus registros de servidor para servir el sitio y proteger el servicio. Las fuentes, los mapas y los datos se cargan desde el mismo servidor. Aparte de GitHub, Plausible y, si te suscribes al boletín, FormSubmit, ningún otro servicio recibe información sobre tu visita.</p>
+<h2>Contacto</h2><p>¿Tienes preguntas o quieres que borremos o corrijamos algo? Escribe a ${MAIL}. Si consideras que tratamos los datos personales de forma incorrecta, puedes reclamar ante la autoridad sueca de protección de datos (<a href="https://www.imy.se/en/" target="_blank" rel="noopener">IMY</a>).</p>`}
+};
+const st={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+let LANG=st.get('fk-lang'); if(!T[LANG]) LANG='sv';
+function show(){ const x=T[LANG]; document.documentElement.lang=LANG; document.title=x.title+' – Friidrottskartan';
+  document.getElementById('content').innerHTML='<h1>'+x.title+'</h1><p class="muted">'+x.date+'</p>'+x.body+'<p><a href="./">'+x.back+'</a></p>';
+  const b=document.getElementById('langbtn'); b.innerHTML=FLAG(LANG)+'<span>'+LANG.toUpperCase()+'</span><span aria-hidden="true">▾</span>'; b.setAttribute('aria-label',(I18N[LANG].lang)+': '+LANGS[LANG].name);
+  document.getElementById('langmenu').innerHTML=Object.keys(LANGS).map(k=>'<button type="button" data-lang="'+k+'" lang="'+k+'">'+FLAG(k)+'<span>'+LANGS[k].name+'</span></button>').join('');
+  if(location.hash){ const el=document.getElementById(location.hash.slice(1)); if(el) el.scrollIntoView(); } }
+const m=document.getElementById('langmenu'), btn=document.getElementById('langbtn');
+btn.onclick=e=>{ e.stopPropagation(); m.hidden=!m.hidden; btn.setAttribute('aria-expanded',!m.hidden); };
+m.onclick=e=>{ const b=e.target.closest('[data-lang]'); if(!b) return; LANG=b.dataset.lang; st.set('fk-lang',LANG); m.hidden=true; show(); };
+document.addEventListener('click',()=>{ m.hidden=true; btn.setAttribute('aria-expanded','false'); });
+show();
+</script>
 </body>
 </html>
