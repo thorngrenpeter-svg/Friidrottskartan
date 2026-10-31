@@ -319,7 +319,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
       <div class="field"><label for="af-first" data-i18n="nf_first">Förnamn</label><input id="af-first" autocomplete="given-name" required></div>
       <div class="field"><label for="af-last" data-i18n="nf_last">Efternamn</label><input id="af-last" autocomplete="family-name" required></div>
       <div class="field"><label for="af-org" data-i18n="af_org">Företag/förening</label><input id="af-org" autocomplete="organization" required></div>
-      <div class="field"><label for="af-phone" data-i18n="af_phone">Telefon</label><div class="phonerow"><select id="af-cc" data-i18n-aria="af_cc" aria-label="Landskod"></select><input id="af-phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="70 123 45 67" required></div></div>
+      <div class="field"><label for="af-phone"><span data-i18n="af_phone">Telefon</span> <span class="opt" data-i18n="nf_opt">(frivilligt)</span></label><div class="phonerow"><select id="af-cc" data-i18n-aria="af_cc" aria-label="Landskod"></select><input id="af-phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="70 123 45 67"></div></div>
       <div class="field wide"><label for="af-email" data-i18n="nf_email">E-post</label><input id="af-email" type="email" autocomplete="email" required></div>
       <input type="text" id="af-honey" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
       <p class="consent" id="af-note"></p>
@@ -405,9 +405,9 @@ $('#adform').addEventListener('submit',async e=>{
   const v=id=>$('#'+id).value.trim();
   const email=v('af-email'), cc=$('#af-cc').value, code=(CC.find(x=>x[0]===cc)||['SE','46'])[1];
   const digits=v('af-phone').replace(/[^\d]/g,'').replace(/^0+/,'');
-  if(!v('af-first')||!v('af-last')||!v('af-org')||digits.length<5||digits.length>14||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ msg.textContent=t('af_invalid'); msg.className='nf-msg err'; return; }
+  if(!v('af-first')||!v('af-last')||!v('af-org')||(digits&&(digits.length<5||digits.length>14))||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ msg.textContent=t('af_invalid'); msg.className='nf-msg err'; return; }
   if(v('af-honey')) return;
-  const phone='+'+code+' '+digits;
+  const phone=digits?'+'+code+' '+digits:'–';
   btn.disabled=true; btn.textContent=t('nf_sending'); msg.textContent=''; msg.className='nf-msg';
   try{
     const r=await fetch('https://formsubmit.co/ajax/spring@friidrottskartan.se',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
