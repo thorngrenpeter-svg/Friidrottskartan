@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Hitta friidrottstävlingar nära dig. Alla kommande friidrottstävlingar i Sverige på en karta – sök på ort, se datum och sista anmälan, och jämför ditt PB med de anmälda i din klass.">
+<meta name="description" content="Hitta friidrottstävlingar nära dig. Kommande friidrottstävlingar i Sverige och utomlands på en karta – sök på ort, se datum och sista anmälan, och jämför ditt PB med de anmälda i din klass.">
 <title>Friidrottskartan – alla friidrottstävlingar i Sverige på en karta</title>
 <link rel="canonical" href="https://www.friidrottskartan.se/">
 <meta property="og:type" content="website">
@@ -230,6 +230,16 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .nf-msg.ok{color:var(--good)}
 .nf-msg.err{color:var(--you)}
 .hp{position:absolute!important;left:-9999px;width:1px;height:1px;opacity:0}
+.calbox{border:1px solid var(--line);border-radius:9px;padding:10px 12px;margin:0 0 14px;display:flex;flex-direction:column;gap:8px}
+.calh{display:flex;align-items:center;gap:6px;color:var(--track)}
+.calh b{color:var(--ink)}
+.calform{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.calform input{flex:1 1 180px;min-width:0;height:36px;border:1px solid var(--line);background:var(--bg);border-radius:7px;padding:0 10px}
+.calform .calmsg{flex-basis:100%}
+.calform .calmsg:empty{display:none}
+.caldirect,.fcal{display:flex;gap:6px 12px;flex-wrap:wrap;align-items:center;font-size:12.5px}
+.caldirect a,.caldirect button,.fcal a,.fcal button{color:var(--track);background:none;border:0;padding:0;cursor:pointer;font-weight:600;text-decoration:none;font-size:12.5px}
+.caldirect button:disabled{opacity:.45;cursor:default}
 @media (max-width:860px){.news{grid-template-columns:minmax(0,1fr)} #newsform{grid-template-columns:minmax(0,1fr)} .hright{justify-content:space-between;width:100%}}
 @media (prefers-reduced-motion:reduce){.clsfield.need select{animation:none}}
 </style>
@@ -297,11 +307,12 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
   </section>
 
   <footer class="about">
-    <h2 data-i18n="about_h">Friidrottstävlingar i hela Sverige</h2>
-    <p><span data-i18n="about_p">Friidrottskartan samlar kommande friidrottstävlingar från EasyRecord, Webathletics, Track &amp; Field och Roster Athletics på ett ställe, inomhus och utomhus, i Sverige och via Roster Athletics även i andra länder, för ungdomar, juniorer, seniorer, veteraner och paraidrottare. Datan uppdateras varje natt.</span> <span id="credits"></span> <a href="integritet.html" data-i18n="about_privacy">Om integritet</a></p>
+    <h2 data-i18n="about_h">Friidrottstävlingar i Sverige och utomlands</h2>
+    <p><span data-i18n="about_p">Friidrottskartan samlar kommande friidrottstävlingar i Sverige och utomlands på ett ställe, med data från EasyRecord, Webathletics, Track &amp; Field och Roster Athletics. Inomhus och utomhus, för ungdomar, juniorer, seniorer, veteraner och paraidrottare. Välj klass, land och ort och se tävlingarna på kartan med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa och ser hur du ligger till mot de anmälda i din klass. Spara favoriter och få dem som kalenderinbjudan i mejlen. Datan uppdateras varje natt.</span> <span id="credits"></span> <a href="integritet.html" data-i18n="about_privacy">Om integritet</a></p>
   </footer>
 </div>
 
+<script src="config.js"></script>
 <script src="i18n.js"></script>
 <script src="d3.min.js"></script>
 <script src="topojson-client.min.js"></script>
@@ -349,8 +360,13 @@ $('#newsform').addEventListener('submit',async e=>{
         _subject:'Ny prenumerant på Friidrottskartan',_template:'table',_captcha:'false'})});
     const j=await r.json().catch(()=>({}));
     if(r.ok && String(j.success)==='true'){ msg.textContent=t('nf_ok'); msg.className='nf-msg ok'; $('#newsform').reset(); track('Nyhetsbrev',{}); }
-    else throw new Error(j.message||'fel');
-  }catch(err){ msg.textContent=t('nf_err'); msg.className='nf-msg err'; }
+    else if(/activat/i.test(j.message||'')){ console.warn('FormSubmit:',j.message); msg.textContent=t('nf_activate'); msg.className='nf-msg err'; }
+    else throw new Error(j.message||('HTTP '+r.status));
+  }catch(err){ console.warn('Nyhetsbrev:',err.message);
+    // reserv: öppna ett färdigt mejl om tjänsten inte svarar
+    const body=[t('nf_first')+': '+v('nf-first'),t('nf_last')+': '+v('nf-last'),t('nf_club')+': '+(v('nf-club')||'–'),t('nf_email')+': '+email].join('\n');
+    const href='mailto:spring@friidrottskartan.se?subject='+encodeURIComponent('Nyhetsbrev – ny prenumerant')+'&body='+encodeURIComponent(body);
+    msg.innerHTML=esc(t('nf_err'))+' <a href="'+href+'">'+esc(t('nf_mail'))+'</a>'; msg.className='nf-msg err'; }
   btn.disabled=false; btn.textContent=t('nf_btn');
 });
 
@@ -441,11 +457,27 @@ function icsText(list){
   L.push('END:VCALENDAR'); return L.map(fold).join('\r\n')+'\r\n'; }
 function downloadICS(list){ if(!list.length) return; const blob=new Blob([icsText(list)],{type:'text/calendar;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download=(list.length===1? list[0].n.replace(/[^\p{L}\p{N}]+/gu,'-').replace(/^-|-$/g,'').slice(0,60) : 'friidrottskartan-favoriter')+'.ics'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); track('Kalender',{typ:'ics',antal:String(list.length)}); }
-function calMenu(c){ return '<details class="calmenu"><summary>'+CAL+'<span>'+esc(t('cal_add'))+'</span></summary><div class="calopts">'
-  +'<a href="'+esc(googleURL(c))+'" target="_blank" rel="noopener" data-cal="google">'+esc(t('cal_google'))+'</a>'
-  +'<a href="'+esc(outlookURL(c,'outlook.live.com'))+'" target="_blank" rel="noopener" data-cal="outlook">'+esc(t('cal_outlook'))+'</a>'
-  +'<a href="'+esc(outlookURL(c,'outlook.office.com'))+'" target="_blank" rel="noopener" data-cal="m365">'+esc(t('cal_m365'))+'</a>'
-  +'<button type="button" data-ics="'+c.idx+'">'+esc(t('cal_ics'))+'</button></div></details>'; }
+const API=((window.FK_CONFIG||{}).calApi||'').replace(/\/$/,'');
+const directLinks=c=>'<a href="'+esc(googleURL(c))+'" target="_blank" rel="noopener" data-cal="google">Google</a><a href="'+esc(outlookURL(c,'outlook.live.com'))+'" target="_blank" rel="noopener" data-cal="outlook">Outlook</a><a href="'+esc(outlookURL(c,'outlook.office.com'))+'" target="_blank" rel="noopener" data-cal="m365">'+esc(t('cal_m365'))+'</a><button type="button" data-ics="'+c.idx+'">.ics</button>';
+const mailForm=(ids,label)=>'<form class="calform" data-ids="'+esc(ids.join(','))+'" novalidate><input type="email" class="calmail" autocomplete="email" placeholder="'+esc(t('cal_email_ph'))+'" aria-label="'+esc(t('nf_email'))+'" value="'+esc(store.get('fk-calmail',''))+'"><button class="btn" type="submit"'+(ids.length?'':' disabled')+'>'+esc(label)+'</button><span class="calmsg nf-msg" role="status"></span></form>';
+function calBox(c){ return '<div class="calbox"><div class="calh">'+CAL+'<b>'+esc(t('cal_add'))+'</b></div>'
+  +(API? mailForm([c.fk],t('cal_send_btn'))+'<p class="note">'+esc(t('cal_mail_note'))+'</p>' : '')
+  +'<div class="caldirect"><span class="meta">'+esc(t(API?'cal_direct':'cal_direct0'))+'</span>'+directLinks(c)+'</div></div>'; }
+async function sendInvites(form){
+  const inp=form.querySelector('.calmail'), btn=form.querySelector('button'), out=form.querySelector('.calmsg');
+  const email=inp.value.trim(), ids=form.dataset.ids.split(',').filter(Boolean);
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){ out.textContent=t('nf_invalid_mail'); out.className='calmsg nf-msg err'; inp.focus(); return; }
+  if(!ids.length) return;
+  store.set('fk-calmail',email);
+  const label=btn.textContent; btn.disabled=true; btn.textContent=t('nf_sending'); out.textContent=''; out.className='calmsg nf-msg';
+  try{
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,ids,lang:LANG})});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok&&j.ok){ out.textContent=t('cal_sent',j.sent,email); out.className='calmsg nf-msg ok'; track('Kalender',{typ:'mejl',antal:String(j.sent)}); }
+    else { out.textContent=t(r.status===429?'cal_limit':'cal_fail'); out.className='calmsg nf-msg err'; }
+  }catch(e){ out.textContent=t('cal_fail'); out.className='calmsg nf-msg err'; }
+  btn.disabled=false; btn.textContent=label;
+}
 
 /* ---------- kontroller ---------- */
 const TODAY0=new Date().toLocaleDateString('sv-SE');
@@ -619,7 +651,7 @@ function paneDetail(c){
    +(c.r?'<dt>'+t('f_deadline')+'</dt><dd>'+c.r+'</dd>':'')+(c.ro&&c.ro>D.updated?'<dt>'+t('f_opens')+'</dt><dd>'+c.ro+'</dd>':'')
    +(c.dist!=null?'<dt>'+t('f_dist')+'</dt><dd>'+esc(t('km_from',Math.round(c.dist),S.cityName))+'</dd>':'')+'</dl>'
    +'<div class="links"><a href="'+L.list+'" target="_blank" rel="noopener">'+esc(t('on_src',t(L.lt),L.name))+' ↗</a>'+(L.info?'<a href="'+L.info+'" target="_blank" rel="noopener">'+esc(t('info_reg'))+' ↗</a>':'')+'</div>'
-   +calMenu(c);
+   +calBox(c);
   if(!c.e.length) h+='<p class="empty">'+esc(t('no_events',L.name))+'</p>';
   byCls.forEach(([cls,evs])=>{ const mc=matchMine(cls);
     h+='<div class="clsh">'+esc(clsLabel(cls))+(mc?' <span class="tag you">'+esc(t('your_cls'))+(mc!==cls?' · '+mc:'')+'</span>':'')+'</div>';
@@ -672,15 +704,18 @@ function paneFav(){
   let h='<h3 class="h3" style="margin-top:0">'+esc(t('fav_h'))+'</h3>';
   if(!list.length) return h+'<p class="empty">'+esc(t('fav_empty'))+'</p>';
   const nSel=list.filter(c=>S.favSel.has(c.fk)).length;
-  h+='<div class="favbar"><label class="chk"><input type="checkbox" id="favall"'+(nSel===list.length?' checked':'')+'> '+esc(t('sel_all'))+'</label><span class="meta">'+esc(t('n_sel',nSel))+'</span>'
-    +'<button class="btn" type="button" id="favics"'+(nSel?'':' disabled')+'>'+CAL+' '+esc(t('cal_sel'))+'</button></div>'
+  const selIds=list.filter(c=>S.favSel.has(c.fk)).map(c=>c.fk);
+  h+='<div class="favbar"><label class="chk"><input type="checkbox" id="favall"'+(nSel===list.length?' checked':'')+'> '+esc(t('sel_all'))+'</label><span class="meta">'+esc(t('n_sel',nSel))+'</span></div>'
+    +'<div class="calbox"><div class="calh">'+CAL+'<b>'+esc(t('cal_add'))+'</b></div>'
+    +(API? mailForm(selIds,t('cal_send_n',nSel))+'<p class="note">'+esc(t('cal_mail_note'))+'</p>' : '')
+    +'<div class="caldirect"><button type="button" id="favics"'+(nSel?'':' disabled')+'>'+esc(t(API?'dl_ics_all':'cal_sel'))+'</button></div></div>'
     +'<div class="list">'+list.map(c=>{ const dt=fmtDate(c);
       return '<div class="fitem"><input type="checkbox" class="fsel" data-fk="'+esc(c.fk)+'"'+(S.favSel.has(c.fk)?' checked':'')+' aria-label="'+esc(c.n)+'">'
        +'<div class="date"><b>'+dt.big+'</b><span>'+dt.small+'</span></div>'
        +'<div class="fmain"><button type="button" class="flink" data-i="'+c.idx+'">'+esc(c.n)+'</button><div class="meta">'+esc(c.c)+(c.co!=='SWE'?', '+esc(coName(c.co)):'')+(c.r?' · '+esc(t('f_deadline'))+' '+c.r:'')+'</div>'
-       +'<div class="fcal"><a href="'+esc(googleURL(c))+'" target="_blank" rel="noopener" data-cal="google">Google</a><a href="'+esc(outlookURL(c,'outlook.live.com'))+'" target="_blank" rel="noopener" data-cal="outlook">Outlook</a><button type="button" data-ics="'+c.idx+'">.ics</button></div></div>'
+       +'<div class="fcal">'+directLinks(c)+'</div></div>'
        +starBtn(c)+'</div>'; }).join('')+'</div>'
-    +'<p class="note" style="margin-top:12px">'+esc(t('fav_note'))+' '+esc(t('fav_local'))+'</p>';
+    +'<p class="note" style="margin-top:12px">'+esc(t(API?'fav_note2':'fav_note'))+' '+esc(t('fav_local'))+'</p>';
   return h;
 }
 function bindPane(){
@@ -692,6 +727,7 @@ function bindPane(){
   pane.querySelectorAll('[data-ics]').forEach(b=>b.addEventListener('click',()=>downloadICS([D.comps[+b.dataset.ics]])));
   pane.querySelectorAll('[data-cal]').forEach(a=>a.addEventListener('click',()=>track('Kalender',{typ:a.dataset.cal})));
   pane.querySelectorAll('.links a').forEach(a=>a.addEventListener('click',()=>track('Till källa',{källa:/easyrecord/.test(a.href)?'EasyRecord':/trackandfield/.test(a.href)?'Track & Field':/rosterathletics/.test(a.href)?'Roster Athletics':'Webathletics'})));
+  pane.querySelectorAll('.calform').forEach(f=>f.addEventListener('submit',e=>{ e.preventDefault(); sendInvites(f); }));
   const bb=$('#backbtn'); if(bb) bb.onclick=()=>{S.sel=null; render();};
   const ab=$('#allbtn'); if(ab) ab.onclick=()=>{S.focusKey=null; S.sel=null; render();};
   const gc=$('#gocls'); if(gc) gc.onclick=()=>{ const s=$('#mycls'); s.scrollIntoView({block:'center',behavior:'smooth'}); s.focus(); try{s.showPicker&&s.showPicker();}catch(e){} };
