@@ -240,6 +240,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .caldirect,.fcal{display:flex;gap:6px 12px;flex-wrap:wrap;align-items:center;font-size:12.5px}
 .caldirect a,.caldirect button,.fcal a,.fcal button{color:var(--track);background:none;border:0;padding:0;cursor:pointer;font-weight:600;text-decoration:none;font-size:12.5px}
 .caldirect button:disabled{opacity:.45;cursor:default}
+@media (max-width:860px){.langmenu{left:0;right:auto;max-width:calc(100vw - 32px)}}
 @media (max-width:860px){.news{grid-template-columns:minmax(0,1fr)} #newsform{grid-template-columns:minmax(0,1fr)} .hright{justify-content:space-between;width:100%}}
 @media (prefers-reduced-motion:reduce){.clsfield.need select{animation:none}}
 </style>
@@ -339,7 +340,7 @@ function applyStatic(){
   $('#langmenu').innerHTML=Object.keys(LANGS).map(k=>'<button type="button" data-lang="'+k+'"'+(k===LANG?' aria-current="true"':'')+' lang="'+k+'">'+FLAG(k)+'<span>'+LANGS[k].name+'</span></button>').join('');
   onLang.forEach(f=>f());
 }
-$('#langbtn').addEventListener('click',e=>{ e.stopPropagation(); const m=$('#langmenu'); m.hidden=!m.hidden; $('#langbtn').setAttribute('aria-expanded',!m.hidden); if(!m.hidden) m.querySelector('button')?.focus(); });
+$('#langbtn').addEventListener('click',e=>{ e.stopPropagation(); const m=$('#langmenu'); m.hidden=!m.hidden; $('#langbtn').setAttribute('aria-expanded',!m.hidden); if(!m.hidden){ m.style.left=''; m.style.right=''; const r=m.getBoundingClientRect(); if(r.left<8){ m.style.left='0'; m.style.right='auto'; } else if(r.right>innerWidth-8){ m.style.right='0'; m.style.left='auto'; } } if(!m.hidden) m.querySelector('button')?.focus(); });
 $('#langmenu').addEventListener('click',e=>{ const b=e.target.closest('[data-lang]'); if(!b) return; LANG=b.dataset.lang; store.set('fk-lang',LANG); $('#langmenu').hidden=true; $('#langbtn').setAttribute('aria-expanded','false'); applyStatic(); track('Språk',{språk:LANG}); $('#langbtn').focus(); });
 document.addEventListener('click',e=>{ if(!e.target.closest('#langsel')){ $('#langmenu').hidden=true; $('#langbtn').setAttribute('aria-expanded','false'); } });
 document.addEventListener('keydown',e=>{ if(e.key==='Escape' && !$('#langmenu').hidden){ $('#langmenu').hidden=true; $('#langbtn').setAttribute('aria-expanded','false'); $('#langbtn').focus(); } });
