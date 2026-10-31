@@ -219,8 +219,14 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .news{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:12px 24px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px}
 .news h2{font-family:var(--f-display);font-size:22px;margin:0 0 4px;letter-spacing:.03em;text-transform:uppercase}
 .news p{margin:0;color:var(--muted)}
-#newsform{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;position:relative}
-#newsform .field input{width:100%}
+#newsform,#adform{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 12px;position:relative}
+#newsform .field input,#adform .field input{width:100%}
+#adform .wide{grid-column:1/-1}
+#af-note{display:block;margin:0}
+.phonerow{display:flex;gap:6px}
+.phonerow select{flex:0 0 auto;max-width:46%}
+.phonerow input{flex:1;min-width:0}
+#annonsera{margin-top:0}
 .opt{text-transform:none;letter-spacing:0;font-family:var(--f-body);font-weight:400}
 .consent{grid-column:1/-1;display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--muted);cursor:pointer}
 .consent input{margin-top:2px;width:16px;height:16px;flex:none}
@@ -241,7 +247,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .caldirect a,.caldirect button,.fcal a,.fcal button{color:var(--track);background:none;border:0;padding:0;cursor:pointer;font-weight:600;text-decoration:none;font-size:12.5px}
 .caldirect button:disabled{opacity:.45;cursor:default}
 @media (max-width:860px){.langmenu{left:0;right:auto;max-width:calc(100vw - 32px)}}
-@media (max-width:860px){.news{grid-template-columns:minmax(0,1fr)} #newsform{grid-template-columns:minmax(0,1fr)} .hright{justify-content:space-between;width:100%}}
+@media (max-width:860px){.news{grid-template-columns:minmax(0,1fr)} #newsform,#adform{grid-template-columns:minmax(0,1fr)} .hright{justify-content:space-between;width:100%}}
 @media (prefers-reduced-motion:reduce){.clsfield.need select{animation:none}}
 </style>
 </head>
@@ -307,9 +313,23 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
     </form>
   </section>
 
+  <section class="news" id="annonsera" aria-labelledby="ad-h">
+    <div class="news-txt"><h2 id="ad-h" data-i18n="ad_h">Annonsera hos oss</h2><p data-i18n="ad_p">Vill ditt företag eller din förening synas på Friidrottskartan? Lämna dina uppgifter så kontaktar vi dig med paket och priser.</p></div>
+    <form id="adform" class="twocol" novalidate>
+      <div class="field"><label for="af-first" data-i18n="nf_first">Förnamn</label><input id="af-first" autocomplete="given-name" required></div>
+      <div class="field"><label for="af-last" data-i18n="nf_last">Efternamn</label><input id="af-last" autocomplete="family-name" required></div>
+      <div class="field"><label for="af-org" data-i18n="af_org">Företag/förening</label><input id="af-org" autocomplete="organization" required></div>
+      <div class="field"><label for="af-phone" data-i18n="af_phone">Telefon</label><div class="phonerow"><select id="af-cc" data-i18n-aria="af_cc" aria-label="Landskod"></select><input id="af-phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="70 123 45 67" required></div></div>
+      <div class="field wide"><label for="af-email" data-i18n="nf_email">E-post</label><input id="af-email" type="email" autocomplete="email" required></div>
+      <input type="text" id="af-honey" tabindex="-1" autocomplete="off" class="hp" aria-hidden="true">
+      <p class="consent" id="af-note"></p>
+      <div class="nf-row"><button class="btn" type="submit" id="af-btn" data-i18n="af_btn">Skicka förfrågan</button><span id="af-msg" class="nf-msg" role="status"></span></div>
+    </form>
+  </section>
+
   <footer class="about">
     <h2 data-i18n="about_h">Friidrottstävlingar i Sverige och utomlands</h2>
-    <p><span data-i18n="about_p">Friidrottskartan samlar kommande friidrottstävlingar i Sverige och utomlands på ett ställe, med data från EasyRecord, Webathletics, Track &amp; Field och Roster Athletics. Inomhus och utomhus, för ungdomar, juniorer, seniorer, veteraner och paraidrottare. Välj klass, land och ort och se tävlingarna på kartan med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa och ser hur du ligger till mot de anmälda i din klass. Spara favoriter och lägg in dem i din kalender. Datan uppdateras varje natt.</span> <span id="credits"></span> <a href="integritet.html" data-i18n="about_privacy">Om integritet</a></p>
+    <p><span data-i18n="about_p">Friidrottskartan samlar kommande friidrottstävlingar i Sverige och utomlands på ett ställe, med data från EasyRecord, Webathletics, Track &amp; Field och Roster Athletics. Inomhus och utomhus, för ungdomar, juniorer, seniorer, veteraner och paraidrottare. Välj klass, land och ort och se tävlingarna på kartan med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa och ser hur du ligger till mot de anmälda i din klass. Spara favoriter och lägg in dem i din kalender. Datan uppdateras varje natt.</span> <span id="credits"></span> <a href="integritet.html" data-i18n="about_privacy">Om integritet</a> · <a href="#annonsera" data-i18n="ad_h">Annonsera hos oss</a></p>
   </footer>
 </div>
 
@@ -338,8 +358,16 @@ function applyStatic(){
   $('#langbtn').innerHTML=FLAG(LANG)+'<span class="lcode">'+LANG.toUpperCase()+'</span><span class="caret" aria-hidden="true">▾</span>';
   $('#langbtn').setAttribute('aria-label',t('lang')+': '+LANGS[LANG].name);
   $('#langmenu').innerHTML=Object.keys(LANGS).map(k=>'<button type="button" data-lang="'+k+'"'+(k===LANG?' aria-current="true"':'')+' lang="'+k+'">'+FLAG(k)+'<span>'+LANGS[k].name+'</span></button>').join('');
+  $('#af-note').innerHTML=t('af_note','<a href="integritet.html#annonser">'+esc(I18N[LANG].af_policy||t('nf_policy'))+'</a>');
+  fillCC();
   onLang.forEach(f=>f());
 }
+// landskoder för telefonfältet (Sverige först, sedan i bokstavsordning på valt språk)
+const CC=[['SE','46'],['NO','47'],['DK','45'],['FI','358'],['IS','354'],['DE','49'],['GB','44'],['IE','353'],['NL','31'],['BE','32'],['FR','33'],['ES','34'],['PT','351'],['IT','39'],['CH','41'],['AT','43'],['PL','48'],['EE','372'],['LV','371'],['LT','370'],['CZ','420'],['RO','40'],['GR','30'],['US','1'],['CA','1'],['AU','61'],['NZ','64'],['ZA','27'],['NG','234'],['KE','254'],['TT','1']];
+function fillCC(){ const sel=$('#af-cc'), cur=sel.value||'SE'; let dn=null; try{ dn=new Intl.DisplayNames([LANG],{type:'region'}); }catch(e){}
+  const nm=c=>{ try{ return dn? dn.of(c) : c; }catch(e){ return c; } };
+  const list=[CC[0],...CC.slice(1).sort((a,b)=>nm(a[0]).localeCompare(nm(b[0]),LANG))];
+  sel.innerHTML=list.map(([c,n])=>'<option value="'+c+'">'+esc(nm(c))+' +'+n+'</option>').join(''); sel.value=cur; }
 $('#langbtn').addEventListener('click',e=>{ e.stopPropagation(); const m=$('#langmenu'); m.hidden=!m.hidden; $('#langbtn').setAttribute('aria-expanded',!m.hidden); if(!m.hidden){ m.style.left=''; m.style.right=''; const r=m.getBoundingClientRect(); if(r.left<8){ m.style.left='0'; m.style.right='auto'; } else if(r.right>innerWidth-8){ m.style.right='0'; m.style.left='auto'; } } if(!m.hidden) m.querySelector('button')?.focus(); });
 $('#langmenu').addEventListener('click',e=>{ const b=e.target.closest('[data-lang]'); if(!b) return; LANG=b.dataset.lang; store.set('fk-lang',LANG); $('#langmenu').hidden=true; $('#langbtn').setAttribute('aria-expanded','false'); applyStatic(); track('Språk',{språk:LANG}); $('#langbtn').focus(); });
 document.addEventListener('click',e=>{ if(!e.target.closest('#langsel')){ $('#langmenu').hidden=true; $('#langbtn').setAttribute('aria-expanded','false'); } });
@@ -368,6 +396,32 @@ $('#newsform').addEventListener('submit',async e=>{
     const href='mailto:spring@friidrottskartan.se?subject='+encodeURIComponent('Nyhetsbrev – ny prenumerant')+'&body='+encodeURIComponent(body);
     msg.innerHTML=esc(t('nf_err'))+' <a href="'+href+'">'+esc(t('nf_mail'))+'</a>'; msg.className='nf-msg err'; }
   btn.disabled=false; btn.textContent=t('nf_btn');
+});
+
+/* =================== annonsförfrågan (FormSubmit skickar till spring@) =================== */
+$('#adform').addEventListener('submit',async e=>{
+  e.preventDefault();
+  const msg=$('#af-msg'), btn=$('#af-btn');
+  const v=id=>$('#'+id).value.trim();
+  const email=v('af-email'), cc=$('#af-cc').value, code=(CC.find(x=>x[0]===cc)||['SE','46'])[1];
+  const digits=v('af-phone').replace(/[^\d]/g,'').replace(/^0+/,'');
+  if(!v('af-first')||!v('af-last')||!v('af-org')||digits.length<5||digits.length>14||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){ msg.textContent=t('af_invalid'); msg.className='nf-msg err'; return; }
+  if(v('af-honey')) return;
+  const phone='+'+code+' '+digits;
+  btn.disabled=true; btn.textContent=t('nf_sending'); msg.textContent=''; msg.className='nf-msg';
+  try{
+    const r=await fetch('https://formsubmit.co/ajax/spring@friidrottskartan.se',{method:'POST',headers:{'Content-Type':'application/json',Accept:'application/json'},
+      body:JSON.stringify({'Förnamn':v('af-first'),'Efternamn':v('af-last'),'Företag/förening':v('af-org'),'Telefon':phone,'email':email,'Språk':LANG,
+        _subject:'Annonsförfrågan: '+v('af-org'),_template:'table',_captcha:'false'})});
+    const j=await r.json().catch(()=>({}));
+    if(r.ok && String(j.success)==='true'){ msg.textContent=t('af_ok'); msg.className='nf-msg ok'; $('#adform').reset(); fillCC(); track('Annonsförfrågan',{}); }
+    else if(/activat/i.test(j.message||'')){ msg.textContent=t('nf_activate'); msg.className='nf-msg err'; }
+    else throw new Error(j.message||('HTTP '+r.status));
+  }catch(err){ console.warn('Annonsförfrågan:',err.message);
+    const body=[t('nf_first')+': '+v('af-first'),t('nf_last')+': '+v('af-last'),t('af_org')+': '+v('af-org'),t('af_phone')+': '+phone,t('nf_email')+': '+email].join('\n');
+    const href='mailto:spring@friidrottskartan.se?subject='+encodeURIComponent('Annonsförfrågan: '+v('af-org'))+'&body='+encodeURIComponent(body);
+    msg.innerHTML=esc(t('nf_err'))+' <a href="'+href+'">'+esc(t('af_mail'))+'</a>'; msg.className='nf-msg err'; }
+  btn.disabled=false; btn.textContent=t('af_btn');
 });
 
 applyStatic();
