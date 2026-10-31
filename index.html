@@ -308,11 +308,10 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 
   <footer class="about">
     <h2 data-i18n="about_h">Friidrottstävlingar i Sverige och utomlands</h2>
-    <p><span data-i18n="about_p">Friidrottskartan samlar kommande friidrottstävlingar i Sverige och utomlands på ett ställe, med data från EasyRecord, Webathletics, Track &amp; Field och Roster Athletics. Inomhus och utomhus, för ungdomar, juniorer, seniorer, veteraner och paraidrottare. Välj klass, land och ort och se tävlingarna på kartan med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa och ser hur du ligger till mot de anmälda i din klass. Spara favoriter och få dem som kalenderinbjudan i mejlen. Datan uppdateras varje natt.</span> <span id="credits"></span> <a href="integritet.html" data-i18n="about_privacy">Om integritet</a></p>
+    <p><span data-i18n="about_p">Friidrottskartan samlar kommande friidrottstävlingar i Sverige och utomlands på ett ställe, med data från EasyRecord, Webathletics, Track &amp; Field och Roster Athletics. Inomhus och utomhus, för ungdomar, juniorer, seniorer, veteraner och paraidrottare. Välj klass, land och ort och se tävlingarna på kartan med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa och ser hur du ligger till mot de anmälda i din klass. Spara favoriter och lägg in dem i din kalender. Datan uppdateras varje natt.</span> <span id="credits"></span> <a href="integritet.html" data-i18n="about_privacy">Om integritet</a></p>
   </footer>
 </div>
 
-<script src="config.js"></script>
 <script src="i18n.js"></script>
 <script src="d3.min.js"></script>
 <script src="topojson-client.min.js"></script>
@@ -457,7 +456,7 @@ function icsText(list){
   L.push('END:VCALENDAR'); return L.map(fold).join('\r\n')+'\r\n'; }
 function downloadICS(list){ if(!list.length) return; const blob=new Blob([icsText(list)],{type:'text/calendar;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
   a.download=(list.length===1? list[0].n.replace(/[^\p{L}\p{N}]+/gu,'-').replace(/^-|-$/g,'').slice(0,60) : 'friidrottskartan-favoriter')+'.ics'; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href); a.remove();},500); track('Kalender',{typ:'ics',antal:String(list.length)}); }
-const API=((window.FK_CONFIG||{}).calApi||'').replace(/\/$/,'');
+const API=''; // mejlutskick av inbjudningar används inte
 const directLinks=c=>'<a href="'+esc(googleURL(c))+'" target="_blank" rel="noopener" data-cal="google">Google</a><a href="'+esc(outlookURL(c,'outlook.live.com'))+'" target="_blank" rel="noopener" data-cal="outlook">Outlook</a><a href="'+esc(outlookURL(c,'outlook.office.com'))+'" target="_blank" rel="noopener" data-cal="m365">'+esc(t('cal_m365'))+'</a><button type="button" data-ics="'+c.idx+'">.ics</button>';
 const mailForm=(ids,label)=>'<form class="calform" data-ids="'+esc(ids.join(','))+'" novalidate><input type="email" class="calmail" autocomplete="email" placeholder="'+esc(t('cal_email_ph'))+'" aria-label="'+esc(t('nf_email'))+'" value="'+esc(store.get('fk-calmail',''))+'"><button class="btn" type="submit"'+(ids.length?'':' disabled')+'>'+esc(label)+'</button><span class="calmsg nf-msg" role="status"></span></form>';
 function calBox(c){ return '<div class="calbox"><div class="calh">'+CAL+'<b>'+esc(t('cal_add'))+'</b></div>'
