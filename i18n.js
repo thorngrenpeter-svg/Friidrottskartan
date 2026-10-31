@@ -1,7 +1,7 @@
 // Översättningar för Friidrottskartan (sv, en, de, fr, es).
 // Lägg till/ändra text här. {0}, {1} ersätts med värden. Funktioner används där ord böjs efter antal.
 window.LANGS = {
-  sv: { name: 'Svenska' }, en: { name: 'English' }, de: { name: 'Deutsch' }, fr: { name: 'Français' }, es: { name: 'Español' }
+  sv: { name: 'Svenska' }, en: { name: 'English' }, de: { name: 'Deutsch' }, fr: { name: 'Français' }, es: { name: 'Español' }, fi: { name: 'Suomi' }, da: { name: 'Dansk' }
 };
 window.FLAG = function (code) {
   const W = 'width="20" height="14" aria-hidden="true" focusable="false" class="flag"';
@@ -11,6 +11,8 @@ window.FLAG = function (code) {
     case 'de': return '<svg ' + W + ' viewBox="0 0 5 3"><rect width="5" height="1" fill="#000"/><rect y="1" width="5" height="1" fill="#DD0000"/><rect y="2" width="5" height="1" fill="#FFCE00"/></svg>';
     case 'fr': return '<svg ' + W + ' viewBox="0 0 3 2"><rect width="1" height="2" fill="#002395"/><rect x="1" width="1" height="2" fill="#fff"/><rect x="2" width="1" height="2" fill="#ED2939"/></svg>';
     case 'es': return '<svg ' + W + ' viewBox="0 0 4 4"><rect width="4" height="4" fill="#AA151B"/><rect y="1" width="4" height="2" fill="#F1BF00"/></svg>';
+    case 'fi': return '<svg ' + W + ' viewBox="0 0 18 11"><rect width="18" height="11" fill="#fff"/><rect x="5" width="3" height="11" fill="#002F6C"/><rect y="4" width="18" height="3" fill="#002F6C"/></svg>';
+    case 'da': return '<svg ' + W + ' viewBox="0 0 37 28"><rect width="37" height="28" fill="#C8102E"/><rect x="12" width="4" height="28" fill="#fff"/><rect y="12" width="37" height="4" fill="#fff"/></svg>';
   }
   return '';
 };
@@ -311,5 +313,122 @@ window.I18N = {
     disc: { 'Höjd': 'Salto de altura', 'Stav': 'Salto con pértiga', 'Längd': 'Salto de longitud', 'Tresteg': 'Triple salto', 'Kula': 'Lanzamiento de peso', 'Diskus': 'Lanzamiento de disco', 'Spjut': 'Lanzamiento de jabalina', 'Slägga': 'Lanzamiento de martillo', 'Viktkastning': 'Lanzamiento de peso pesado', 'Boll': 'Lanzamiento de pelota', '1 timme': '1 hora' },
     hurdles: 'vallas', steeple: 'obstáculos', walk: 'marcha',
     ord: n => n + '.º'
+  },
+  /* ------------------------------------------------ SUOMI */
+  fi: {
+    lang: 'Kieli',
+    lbl_class: 'Sarjasi', cls_ph: 'Valitse sarja…', cls_start: 'Aloita tästä',
+    lbl_country: 'Maa', lbl_city: 'Paikkakunta', ph_city_swe: 'esim. Örebro', ph_city_all: 'Hae paikkakuntaa', ph_city_eg: x => 'esim. ' + x,
+    lbl_radius: 'Etäisyys', opt_whole: c => 'Koko maa', opt_allc: 'Kaikki maat',
+    lbl_period: 'Ajanjakso', opt_allp: 'Kaikki tulevat',
+    lbl_arena: 'Kilpailupaikka', io_all: 'Kaikki', io_in: 'Sisällä', io_out: 'Ulkona',
+    lbl_mine: 'Omat sarjat', chip_mine: 'Vain omat sarjat',
+    btn_search: 'Hae', btn_reset: 'Tyhjennä', zoom_in: 'Lähennä', zoom_out: 'Loitonna',
+    tab_list: 'Kilpailut', tab_pb: 'Omat ennätykset', tab_fav: 'Suosikit',
+    stamp: (links, date) => 'Tulevat yleisurheilukilpailut: ' + links + ' · ilmoittautumiset päivitetty ' + date, and: 'ja', privacy: 'Tietosuoja',
+    about_h: 'Yleisurheilukilpailut Ruotsissa ja ulkomailla',
+    about_p: 'Friidrottskartan kokoaa tulevat yleisurheilukilpailut Ruotsissa ja ulkomailla yhteen paikkaan. Tiedot tulevat EasyRecordista, Webathleticsista, Track & Fieldistä ja Roster Athleticsista. Mukana on sisä- ja ulkokilpailuja nuorille, junioreille, aikuisille, veteraaneille ja parayleisurheilijoille. Valitse sarja, maa ja paikkakunta, niin näet kilpailut kartalla päivämäärän, kilpailupaikan, järjestäjän ja ilmoittautumisen takarajan kanssa. Omat ennätykset -kohdassa syötät ennätyksesi ja näet, miten sijoitut sarjasi ilmoittautuneisiin. Tallenna suosikit ja lisää ne kalenteriisi. Tiedot päivittyvät joka yö.',
+    credits: osm => 'Karttatiedot: Natural Earth. Ruotsin ulkopuoliset paikkakunnat: © ' + osm + ' -tekijät.', about_privacy: 'Tietosuojasta',
+    map_aria: x => 'Kartta: ' + x + ' ja kilpailupaikat', world: 'maailma', mapnote0: 'Napsauta pistettä nähdäksesi paikan kilpailut',
+    n_comps: n => n + ' ' + (n === 1 ? 'kilpailu' : 'kilpailua'), n_places: n => n + ' ' + (n === 1 ? 'paikkakunta' : 'paikkakuntaa'), on_places: (a, b) => a + ', ' + b,
+    within: (r, c) => r + ' km:n säteellä paikasta ' + c, dist_from: c => 'etäisyys paikasta ' + c, sorted_from: c => 'järjestetty etäisyyden mukaan paikasta ' + c,
+    none_match: 'Yksikään kilpailu ei vastaa suodattimia',
+    upcoming: n => n + ' ' + (n === 1 ? 'tuleva kilpailu' : 'tulevaa kilpailua'), in_all: 'kaikissa maissa', in_c: c => '– ' + c, in_swe: 'koko Ruotsissa',
+    show_all: 'Näytä kaikki', in_place: c => '– ' + c,
+    empty_list: 'Ei osumia. Kasvata etäisyyttä tai valitse toinen ajanjakso.',
+    not_found: q => 'Paikkakuntaa "' + q + '" ei löytynyt. Kokeile lähellä olevaa suurempaa paikkakuntaa.',
+    t_in: 'Sisällä', t_out: 'Ulkona', n_entries: n => n + ' ' + (n === 1 ? 'ilmoittautuminen' : 'ilmoittautumista'), no_entries: 'Ei vielä ilmoittautuneita', cls_present: c => c + ' mukana',
+    back: '← Takaisin listaan', f_date: 'Päivämäärä', f_place: 'Paikka', f_in: '(sisällä)', f_out: '(ulkona)', f_mapnote: 'karttapiste näyttää paikkakunnan',
+    f_host: 'Järjestäjä', f_deadline: 'Ilmoittautuminen viimeistään', f_opens: 'Ilmoittautuminen alkaa', f_dist: 'Etäisyys', km_from: (n, c) => n + ' km paikasta ' + c,
+    lt_start: 'Lähtölista', lt_entry: 'Osallistujalista', lt_page: 'Kilpailusivu', on_src: (l, s) => l + ' – ' + s, info_reg: 'Tiedot ja ilmoittautuminen',
+    no_events: s => 'Yksilölajeissa ei vielä ole ilmoittautuneita, tai mukana on vain moniotteluita. Katso lajiohjelma: ' + s + '.',
+    your_cls: 'sarjasi', n_entered: n => n + ' ' + (n === 1 ? 'ilmoittautunut' : 'ilmoittautunutta'), you_place: (o, n) => 'sinä ' + o + ' / ' + n,
+    detail_note: s => 'Listassa näkyvät ilmoittautuneiden ennätykset ilman nimiä. Ilmoittautuneet näet lähtölistasta palvelussa ' + s + '.',
+    entered: 'Ilmoittautunut', you_cls: c => 'Sinä (' + c + ')', no_pb: n => n + ' ' + (n === 1 ? 'ilmoittautunut' : 'ilmoittautunutta') + ' ilman kirjattua ennätystä',
+    fav_add: 'Tallenna suosikiksi', fav_rm: 'Poista suosikeista', fav_on: 'Suosikki',
+    cal_add: 'Lisää kalenteriin', cal_google: 'Google-kalenteri', cal_outlook: 'Outlook.com', cal_m365: 'Outlook (työ/koulu)', cal_ics: 'Apple / muu kalenteri (.ics)',
+    cal_more: 'Lisätietoja', cal_from: 'Friidrottskartanista', cal_direct0: 'Lisää suoraan:', dl_ics_all: 'Lataa valitut .ics-tiedostona',
+    choose_first: 'Aloita valitsemalla sarjasi – näet heti, miten sijoitut kunkin kilpailun ilmoittautuneisiin.', choose_btn: 'Valitse sarja',
+    pb_intro: 'Valitse sarja ja syötä ennätyksesi. Voit tallentaa ennätyksiä useaan sarjaan, esimerkiksi jos sinulla on eri-ikäisiä lapsia.', pb_local: 'Ennätyksesi tallennetaan vain tähän selaimeen.',
+    lbl_agecls: 'Ikäsarja', your_classes: 'Omat sarjasi', unsaved: 'tallentamatta',
+    save_cls: c => 'Tallenna sarjan ' + c + ' ennätykset', save_all: n => 'Tallenna kaikki sarjat (' + n + ')', clear_cls: 'Tyhjennä sarja', saved_ok: 'Tallennettu',
+    ph_field: 'm, esim. 4,20', ph_long: 'esim. 2:31,40', ph_sprint: 's, esim. 9,12', n_short: n => n + ' ilm.',
+    how_h: 'Näin sijoitut', how_none: 'Valitulla alueella ei ole kilpailuja, joissa olisi ilmoittautuneita sarjoissasi lajeissa, joissa sinulla on ennätys. Kokeile suurempaa etäisyyttä tai toista ajanjaksoa.',
+    how_note: 'Sijoitus samassa sarjassa ja lajissa ilmoittautuneiden joukossa, joilla on ennätys, nykyisillä suodattimilla. Pisteet näyttävät kaikki ilmoittautuneet parhaasta heikoimpaan.',
+    best: 'Paras', you: 'Sinä', n_ent_meta: n => n + ' ' + (n === 1 ? 'ilmoittautunut' : 'ilmoittautunutta'),
+    fav_h: 'Suosikit', fav_empty: 'Sinulla ei ole vielä suosikkeja. Napsauta kilpailun tähteä tallentaaksesi sen tänne.',
+    sel_all: 'Valitse kaikki', n_sel: n => n + ' valittu', cal_sel: 'Lisää valitut kalenteriin (.ics)',
+    fav_note: '.ics-tiedostolla kaikki valitut kilpailut lisätään kerralla: avaa tiedosto puhelimella tai tietokoneella tai tuo se Google-kalenteriin (Asetukset → Tuo ja vie). Google- ja Outlook-painikkeet lisäävät yhden kilpailun kerrallaan.',
+    fav_local: 'Suosikit tallennetaan vain tähän selaimeen.',
+    grp: { F: 'Tytöt (F)', P: 'Pojat (P)', S: 'Aikuiset (K = naiset, M = miehet)', VK: 'Veteraaninaiset', VM: 'Veteraanimiehet', Para: 'Para' },
+    cls: { KV: 'Veteraaninaiset', MV: 'Veteraanimiehet', 'KV MV': 'Veteraanit', Para: 'Para (vammaisurheilu)' },
+    news_h: 'Uutiskirje', news_p: 'Saat uutisia, kilpailuvinkkejä ja tietoa uusista toiminnoista suoraan sähköpostiisi.',
+    nf_first: 'Etunimi', nf_last: 'Sukunimi', nf_club: 'Seura', nf_opt: '(vapaaehtoinen)', nf_email: 'Sähköposti',
+    nf_consent: l => 'Haluan vastaanottaa Friidrottskartanin uutiskirjeen ja hyväksyn, että tietoni tallennetaan ' + l + ' mukaisesti. Voin perua tilauksen milloin tahansa.',
+    nf_policy: 'tietosuojaselosteen', nf_btn: 'Tilaa', nf_sending: 'Lähetetään…', nf_ok: 'Kiitos! Olet nyt tilannut uutiskirjeen.',
+    nf_err: 'Lähettäminen ei onnistunut juuri nyt.', nf_activate: 'Lomaketta aktivoidaan. Yritä hetken kuluttua uudelleen.', nf_mail: 'Lähetä tilaus sähköpostilla', nf_invalid: 'Täytä etunimi, sukunimi ja sähköposti ja rastita ruutu.', nf_invalid_mail: 'Kirjoita kelvollinen sähköpostiosoite.',
+    load_err: 'Kilpailutietoja ei voitu ladata. Lataa sivu uudelleen hetken kuluttua.',
+    disc: { 'Höjd': 'Korkeushyppy', 'Stav': 'Seiväshyppy', 'Längd': 'Pituushyppy', 'Tresteg': 'Kolmiloikka', 'Kula': 'Kuulantyöntö', 'Diskus': 'Kiekonheitto', 'Spjut': 'Keihäänheitto', 'Slägga': 'Moukarinheitto', 'Viktkastning': 'Painonheitto', 'Boll': 'Pallonheitto', '1 timme': 'Tunnin juoksu' },
+    hurdles: 'aidat', steeple: 'estejuoksu', walk: 'kävely',
+    ord: n => n + '.'
+  },
+  /* ------------------------------------------------ DANSK */
+  da: {
+    lang: 'Sprog',
+    lbl_class: 'Din klasse', cls_ph: 'Vælg klasse…', cls_start: 'Start her',
+    lbl_country: 'Land', lbl_city: 'By', ph_city_swe: 'fx Örebro', ph_city_all: 'Søg by', ph_city_eg: x => 'fx ' + x,
+    lbl_radius: 'Afstand', opt_whole: c => 'Hele ' + c, opt_allc: 'Alle lande',
+    lbl_period: 'Periode', opt_allp: 'Alle kommende',
+    lbl_arena: 'Sted', io_all: 'Alle', io_in: 'Indendørs', io_out: 'Udendørs',
+    lbl_mine: 'Mine klasser', chip_mine: 'Kun mine klasser',
+    btn_search: 'Søg', btn_reset: 'Ryd', zoom_in: 'Zoom ind', zoom_out: 'Zoom ud',
+    tab_list: 'Stævner', tab_pb: 'Mine PR', tab_fav: 'Mine favoritter',
+    stamp: (links, date) => 'Kommende atletikstævner fra ' + links + ' · tilmeldinger opdateret ' + date, and: 'og', privacy: 'Privatliv',
+    about_h: 'Atletikstævner i Sverige og udlandet',
+    about_p: 'Friidrottskartan samler kommende atletikstævner i Sverige og udlandet ét sted, med data fra EasyRecord, Webathletics, Track & Field og Roster Athletics. Indendørs og udendørs, for børn og unge, juniorer, seniorer, veteraner og para-atleter. Vælg klasse, land og by, og se stævnerne på kortet med dato, sted, arrangør og tilmeldingsfrist. Under Mine PR indtaster du dine personlige rekorder og ser, hvordan du ligger i forhold til de tilmeldte i din klasse. Gem favoritter og læg dem i din kalender. Dataene opdateres hver nat.',
+    credits: osm => 'Kortdata: Natural Earth. Byer uden for Sverige: © ' + osm + '-bidragydere.', about_privacy: 'Om privatliv',
+    map_aria: x => 'Kort over ' + x + ' med stævnesteder', world: 'verden', mapnote0: 'Klik på et punkt for at se stævnerne der',
+    n_comps: n => n + ' ' + (n === 1 ? 'stævne' : 'stævner'), n_places: n => n + ' ' + (n === 1 ? 'by' : 'byer'), on_places: (a, b) => a + ' i ' + b,
+    within: (r, c) => 'inden for ' + r + ' km fra ' + c, dist_from: c => 'afstand fra ' + c, sorted_from: c => 'sorteret efter afstand fra ' + c,
+    none_match: 'Ingen stævner passer til filtrene',
+    upcoming: n => n + ' ' + (n === 1 ? 'kommende stævne' : 'kommende stævner'), in_all: 'i alle lande', in_c: c => 'i ' + c, in_swe: 'i hele Sverige',
+    show_all: 'Vis alle', in_place: c => 'i ' + c,
+    empty_list: 'Ingen stævner passer. Øg afstanden eller vælg en anden periode.',
+    not_found: q => 'Fandt ingen by med navnet "' + q + '". Prøv en større by i nærheden.',
+    t_in: 'Indendørs', t_out: 'Udendørs', n_entries: n => n + ' ' + (n === 1 ? 'tilmelding' : 'tilmeldinger'), no_entries: 'Ingen tilmeldte endnu', cls_present: c => c + ' tilmeldt',
+    back: '← Tilbage til listen', f_date: 'Dato', f_place: 'Sted', f_in: '(indendørs)', f_out: '(udendørs)', f_mapnote: 'kortpunktet viser byen',
+    f_host: 'Arrangør', f_deadline: 'Tilmeldingsfrist', f_opens: 'Tilmelding åbner', f_dist: 'Afstand', km_from: (n, c) => n + ' km fra ' + c,
+    lt_start: 'Startliste', lt_entry: 'Deltagerliste', lt_page: 'Stævneside', on_src: (l, s) => l + ' på ' + s, info_reg: 'Info og tilmelding',
+    no_events: s => 'Endnu ingen individuelle discipliner med tilmeldte, eller kun mangekamp. Se programmet på ' + s + '.',
+    your_cls: 'din klasse', n_entered: n => n + ' tilmeldt' + (n === 1 ? '' : 'e'), you_place: (o, n) => 'du ' + o + ' af ' + n,
+    detail_note: s => 'Listen viser de tilmeldtes personlige rekorder (PR) uden navne. Hvem der er tilmeldt, kan du se på startlisten hos ' + s + '.',
+    entered: 'Tilmeldt', you_cls: c => 'Dig (' + c + ')', no_pb: n => n + ' tilmeldt' + (n === 1 ? '' : 'e') + ' uden registreret PR',
+    fav_add: 'Gem som favorit', fav_rm: 'Fjern fra favoritter', fav_on: 'Favorit',
+    cal_add: 'Tilføj til kalender', cal_google: 'Google Kalender', cal_outlook: 'Outlook.com', cal_m365: 'Outlook (arbejde/skole)', cal_ics: 'Apple / anden kalender (.ics)',
+    cal_more: 'Mere information', cal_from: 'Fra Friidrottskartan', cal_direct0: 'Tilføj direkte:', dl_ics_all: 'Hent de valgte som .ics-fil',
+    choose_first: 'Start med at vælge din klasse – så kan du med det samme se, hvordan du ligger i forhold til de tilmeldte i hvert stævne.', choose_btn: 'Vælg klasse',
+    pb_intro: 'Vælg en klasse og indtast dine PR. Du kan gemme PR i flere klasser, fx hvis du har børn i forskellige aldre.', pb_local: 'Dine PR gemmes kun i denne browser.',
+    lbl_agecls: 'Aldersklasse', your_classes: 'Dine klasser', unsaved: 'ikke gemt',
+    save_cls: c => 'Gem PR for ' + c, save_all: n => 'Gem alle klasser (' + n + ')', clear_cls: 'Ryd klassen', saved_ok: 'Gemt',
+    ph_field: 'm, fx 4,20', ph_long: 'fx 2:31,40', ph_sprint: 'sek., fx 9,12', n_short: n => n + ' tilm.',
+    how_h: 'Sådan ligger du', how_none: 'Intet stævne i det valgte område har tilmeldte i dine klasser i discipliner, hvor du har en PR. Prøv en større afstand eller en anden periode.',
+    how_note: 'Placering blandt tilmeldte med PR i samme klasse og disciplin inden for de aktuelle filtre. Prikkerne viser alle tilmeldte fra bedst til dårligst.',
+    best: 'Bedst', you: 'Dig', n_ent_meta: n => n + ' tilmeldt' + (n === 1 ? '' : 'e'),
+    fav_h: 'Mine favoritter', fav_empty: 'Du har ingen favoritter endnu. Klik på stjernen ved et stævne for at gemme det her.',
+    sel_all: 'Vælg alle', n_sel: n => n + ' valgt', cal_sel: 'Læg de valgte i kalenderen (.ics)',
+    fav_note: 'Med .ics-filen lægges alle valgte stævner ind på én gang: åbn filen på telefonen eller computeren, eller importér den i Google Kalender (Indstillinger → Import og eksport). Google- og Outlook-knapperne tilføjer ét stævne ad gangen.',
+    fav_local: 'Favoritterne gemmes kun i denne browser.',
+    grp: { F: 'Piger (F)', P: 'Drenge (P)', S: 'Seniorer (K = kvinder, M = mænd)', VK: 'Veteraner kvinder', VM: 'Veteraner mænd', Para: 'Para' },
+    cls: { KV: 'Veteraner kvinder', MV: 'Veteraner mænd', 'KV MV': 'Veteraner', Para: 'Para (handicapklasse)' },
+    news_h: 'Nyhedsbrev', news_p: 'Få nyheder, tips om stævner og nye funktioner fra Friidrottskartan direkte i indbakken.',
+    nf_first: 'Fornavn', nf_last: 'Efternavn', nf_club: 'Klub', nf_opt: '(valgfrit)', nf_email: 'E-mail',
+    nf_consent: l => 'Jeg vil gerne modtage nyhedsbrevet fra Friidrottskartan og accepterer, at mine oplysninger gemmes i henhold til ' + l + '. Jeg kan afmelde mig når som helst.',
+    nf_policy: 'privatlivspolitikken', nf_btn: 'Tilmeld', nf_sending: 'Sender…', nf_ok: 'Tak! Du er nu tilmeldt nyhedsbrevet.',
+    nf_err: 'Det kunne ikke sendes lige nu.', nf_activate: 'Formularen er ved at blive aktiveret. Prøv igen om lidt.', nf_mail: 'Send tilmeldingen via e-mail i stedet', nf_invalid: 'Udfyld fornavn, efternavn og e-mail, og sæt kryds i feltet.', nf_invalid_mail: 'Skriv en gyldig e-mailadresse.',
+    load_err: 'Stævnedataene kunne ikke indlæses. Genindlæs siden om lidt.',
+    disc: { 'Höjd': 'Højdespring', 'Stav': 'Stangspring', 'Längd': 'Længdespring', 'Tresteg': 'Trespring', 'Kula': 'Kuglestød', 'Diskus': 'Diskoskast', 'Spjut': 'Spydkast', 'Slägga': 'Hammerkast', 'Viktkastning': 'Vægtkast', 'Boll': 'Boldkast', '1 timme': '1 time' },
+    hurdles: 'hæk', steeple: 'forhindring', walk: 'gang',
+    ord: n => n + '.'
   }
+
 };

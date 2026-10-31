@@ -324,7 +324,7 @@ const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v)
 function track(name,props){ try{ if(window.plausible) window.plausible(name,{props}); }catch(e){} }
 let LANG=(()=>{ const s=store.get('fk-lang',null); return s&&I18N[s]? s : 'sv'; })(); // svenska som standard, besökaren väljer själv
 const t=(k,...a)=>{ const v=(I18N[LANG][k]!==undefined?I18N[LANG][k]:I18N.sv[k]); return typeof v==='function'? v(...a) : (v===undefined?k:v); };
-const LOC={sv:'sv-SE',en:'en-GB',de:'de-DE',fr:'fr-FR',es:'es-ES'};
+const LOC={sv:'sv-SE',en:'en-GB',de:'de-DE',fr:'fr-FR',es:'es-ES',fi:'fi-FI',da:'da-DK'};
 let MON=[];
 function setMonths(){ MON=[...Array(12)].map((_,i)=>{ let s=new Intl.DateTimeFormat(LOC[LANG],{month:'short'}).format(new Date(2026,i,15)); return s.replace(/\.$/,''); }); }
 const onLang=[]; // funktioner som körs när språket byts
