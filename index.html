@@ -463,7 +463,7 @@ D.comps.forEach((c,i)=>{c.idx=i;c.co=c.co||'SWE';c.fk=c.s+':'+c.id;c.e.forEach(e
 D.cities.forEach(c=>{c[3]=c[3]||'SWE'});
 /* ---------- tips och annonser: styrs från tips.json (bild, länk, text, start- och slutdatum) ---------- */
 let TIPS=[];
-fetch('tips.json?v='+D.updated).then(r=>r.ok?r.json():[]).then(a=>{ const d=new Date().toLocaleDateString('sv-SE'); TIPS=(a||[]).filter(x=>(!x.start||x.start<=d)&&(!x.slut||x.slut>=d)); if(TIPS.length&&proj) render(false,true); }).catch(()=>{});
+fetch('tips.json',{cache:'no-cache'}).then(r=>r.ok?r.json():[]).then(a=>{ const d=new Date().toLocaleDateString('sv-SE'); TIPS=(a||[]).filter(x=>(!x.start||x.start<=d)&&(!x.slut||x.slut>=d)); if(TIPS.length&&proj) render(false,true); }).catch(()=>{});
 const tt=(k,d)=>{ const v=t(k); return v===k?d:v; }; // reservtext om i18n.js är en äldre version
 const tipFor=n=> TIPS.length? TIPS[n%TIPS.length] : null;
 function tipHTML(x){ if(!x) return '';
