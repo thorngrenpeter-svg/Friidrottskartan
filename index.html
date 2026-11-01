@@ -248,6 +248,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .caldirect button:disabled{opacity:.45;cursor:default}
 .tipcard{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr);gap:12px;align-items:center;margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);text-decoration:none}
 .tipcard:hover{border-color:var(--track)}
+.tipcard.noimg{grid-template-columns:minmax(0,1fr)}
 .tipcard img{width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;border-radius:7px;display:block;background:var(--line)}
 .tipbody{display:flex;flex-direction:column;gap:3px;min-width:0}
 .tiplbl{font-family:var(--f-display);font-weight:600;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
@@ -463,13 +464,14 @@ D.cities.forEach(c=>{c[3]=c[3]||'SWE'});
 /* ---------- tips och annonser: styrs från tips.json (bild, länk, text, start- och slutdatum) ---------- */
 let TIPS=[];
 fetch('tips.json?v='+D.updated).then(r=>r.ok?r.json():[]).then(a=>{ const d=new Date().toLocaleDateString('sv-SE'); TIPS=(a||[]).filter(x=>(!x.start||x.start<=d)&&(!x.slut||x.slut>=d)); if(TIPS.length&&proj) render(false,true); }).catch(()=>{});
+const tt=(k,d)=>{ const v=t(k); return v===k?d:v; }; // reservtext om i18n.js är en äldre version
 const tipFor=n=> TIPS.length? TIPS[n%TIPS.length] : null;
 function tipHTML(x){ if(!x) return '';
   const txt=(x.text&&(x.text[LANG]||x.text.sv))||'';
   return '<a class="tipcard" href="'+esc(x.lank)+'" target="_blank" rel="noopener'+(x.typ==='annons'?' sponsored':'')+'" data-tip="'+esc(x.id)+'">'
-    +'<img src="'+esc(x.bild)+'" alt="'+esc(x.titel||'')+'" width="'+(x.bredd||800)+'" height="'+(x.hojd||450)+'" loading="lazy" decoding="async">'
-    +'<span class="tipbody"><span class="tiplbl">'+esc(t(x.typ==='annons'?'ad_label':'tip_label'))+'</span><b>'+esc(x.titel||'')+'</b><span class="tiptxt">'+esc(txt)+'</span>'
-    +'<span class="tipcta"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21.6 7.2a2.6 2.6 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.6 2.6 0 0 0 2.4 7.2 27 27 0 0 0 2 12a27 27 0 0 0 .4 4.8 2.6 2.6 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.6 2.6 0 0 0 1.8-1.8A27 27 0 0 0 22 12a27 27 0 0 0-.4-4.8zM10 15V9l5.2 3z"/></svg>'+esc(t(/youtube/.test(x.lank)?'tip_cta_yt':'tip_cta'))+'</span></span></a>'; }
+    +'<img src="'+esc(x.bild)+'" alt="'+esc(x.titel||'')+'" width="'+(x.bredd||800)+'" height="'+(x.hojd||450)+'" loading="lazy" decoding="async" onerror="this.parentNode.classList.add(\'noimg\');this.remove()">'
+    +'<span class="tipbody"><span class="tiplbl">'+esc(tt(x.typ==='annons'?'ad_label':'tip_label',x.typ==='annons'?'Annons':'Tips från oss'))+'</span><b>'+esc(x.titel||'')+'</b><span class="tiptxt">'+esc(txt)+'</span>'
+    +'<span class="tipcta"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path fill="currentColor" d="M21.6 7.2a2.6 2.6 0 0 0-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4A2.6 2.6 0 0 0 2.4 7.2 27 27 0 0 0 2 12a27 27 0 0 0 .4 4.8 2.6 2.6 0 0 0 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4a2.6 2.6 0 0 0 1.8-1.8A27 27 0 0 0 22 12a27 27 0 0 0-.4-4.8zM10 15V9l5.2 3z"/></svg>'+esc(/youtube/.test(x.lank)?tt('tip_cta_yt','Se på YouTube'):tt('tip_cta','Läs mer'))+'</span></span></a>'; }
 /* ---------- länder ---------- */
 const ISO3=Object.fromEntries('ABWAW AFGAF AGOAO AIAAI ALAAX ALBAL ANDAD AREAE ARGAR ARMAM ASMAS ATAAQ ATFTF ATGAG AUSAU AUTAT AZEAZ BDIBI BELBE BENBJ BESBQ BFABF BGDBD BGRBG BHRBH BHSBS BIHBA BLMBL BLRBY BLZBZ BMUBM BOLBO BRABR BRBBB BRNBN BTNBT BVTBV BWABW CAFCF CANCA CCKCC CHECH CHLCL CHNCN CIVCI CMRCM CODCD COGCG COKCK COLCO COMKM CPVCV CRICR CUBCU CUWCW CXRCX CYMKY CYPCY CZECZ DEUDE DJIDJ DMADM DNKDK DOMDO DZADZ ECUEC EGYEG ERIER ESHEH ESPES ESTEE ETHET FINFI FJIFJ FLKFK FRAFR FROFO FSMFM GABGA GBRGB GEOGE GGYGG GHAGH GIBGI GINGN GLPGP GMBGM GNBGW GNQGQ GRCGR GRDGD GRLGL GTMGT GUFGF GUMGU GUYGY HKGHK HMDHM HNDHN HRVHR HTIHT HUNHU IDNID IMNIM INDIN IOTIO IRLIE IRNIR IRQIQ ISLIS ISRIL ITAIT JAMJM JEYJE JORJO JPNJP KAZKZ KENKE KGZKG KHMKH KIRKI KNAKN KORKR KWTKW LAOLA LBNLB LBRLR LBYLY LCALC LIELI LKALK LSOLS LTULT LUXLU LVALV MACMO MAFMF MARMA MCOMC MDAMD MDGMG MDVMV MEXMX MHLMH MKDMK MLIML MLTMT MMRMM MNEME MNGMN MNPMP MOZMZ MRTMR MSRMS MTQMQ MUSMU MWIMW MYSMY MYTYT NAMNA NCLNC NERNE NFKNF NGANG NICNI NIUNU NLDNL NORNO NPLNP NRUNR NZLNZ OMNOM PAKPK PANPA PCNPN PERPE PHLPH PLWPW PNGPG POLPL PRIPR PRKKP PRTPT PRYPY PSEPS PYFPF QATQA REURE ROURO RUSRU RWARW SAUSA SDNSD SENSN SGPSG SGSGS SHNSH SJMSJ SLBSB SLESL SLVSV SMRSM SOMSO SPMPM SRBRS SSDSS STPST SURSR SVKSK SVNSI SWESE SWZSZ SXMSX SYCSC SYRSY TCATC TCDTD TGOTG THATH TJKTJ TKLTK TKMTM TLSTL TONTO TTOTT TUNTN TURTR TUVTV TWNTW TZATZ UGAUG UKRUA UMIUM URYUY USAUS UZBUZ VATVA VCTVC VENVE VGBVG VIRVI VNMVN VUTVU WLFWF WSMWS XKKXK YEMYE ZAFZA ZMBZM ZWEZW'.split(' ').map(x=>[x.slice(0,3),x.slice(3)]));
 function coName(a3){ if(a3==='all') return t('opt_allc'); try{ return new Intl.DisplayNames([LANG],{type:'region'}).of(ISO3[a3])||a3; }catch(e){ return a3; } }
