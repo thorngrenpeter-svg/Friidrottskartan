@@ -1,0 +1,22 @@
+[
+  {
+    "id": "terranomads",
+    "typ": "tips",
+    "bild": "tips/terranomads.webp",
+    "bredd": 800,
+    "hojd": 447,
+    "lank": "https://www.youtube.com/@Terra-Nomads",
+    "start": "2026-11-01",
+    "slut": "2026-11-15",
+    "titel": "TerraNomads · YouTube",
+    "text": {
+      "sv": "En YouTube-kanal för dig som älskar trailrunning, löpning i stan och livet utomhus.",
+      "en": "A YouTube channel for runners who love trail running, urban running and life outdoors.",
+      "de": "Ein YouTube-Kanal für alle, die Trailrunning, Laufen in der Stadt und das Leben draußen lieben.",
+      "fr": "Une chaîne YouTube pour les coureurs qui aiment le trail, la course en ville et la vie en plein air.",
+      "es": "Un canal de YouTube para corredores que aman el trail running, correr por la ciudad y la vida al aire libre.",
+      "fi": "YouTube-kanava juoksijoille, jotka rakastavat polkujuoksua, kaupunkijuoksua ja ulkoilmaelämää.",
+      "da": "En YouTube-kanal for løbere, der elsker trailløb, løb i byen og livet udendørs."
+    }
+  }
+]
