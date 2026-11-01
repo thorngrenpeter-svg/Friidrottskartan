@@ -707,7 +707,7 @@ function paneList(list){
   if(S.focusKey){ shown=list.filter(c=>c.key===S.focusKey); h+='<p class="summary">'+t('n_comps',shown.length)+' '+esc(t('in_place',shown[0]?.c||''))+' · <button class="back" id="allbtn">'+esc(t('show_all'))+'</button></p>'; }
   else h+='<p class="summary">'+t('upcoming',list.length)+' '+esc(S.center?(S.radius>0?t('within',S.radius,S.cityName):t('sorted_from',S.cityName)):(S.country==='all'?t('in_all'):S.country==='SWE'?t('in_swe'):t('in_c',coName(S.country))))+'</p>';
   if(S.center && S.radius===0) shown=[...shown].sort((a,b)=>a.dist-b.dist);
-  h+= shown.length? '<div class="list">'+shown.map((c,i)=>itemHTML(c)+((i+1)%10===0?tipHTML(tipFor((i+1)/10-1)):'')).join('')+'</div>' : '<p class="empty">'+esc(t('empty_list'))+'</p>';
+  h+= shown.length? '<div class="list">'+shown.map((c,i)=>itemHTML(c)+((i+1)%5===0?tipHTML(tipFor((i+1)/5-1)):'')).join('')+'</div>' : '<p class="empty">'+esc(t('empty_list'))+'</p>';
   return h;
 }
 function startlistHTML(ev,cls,my){
