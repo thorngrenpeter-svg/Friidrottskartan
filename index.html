@@ -227,6 +227,9 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .phonerow select{flex:0 0 auto;max-width:46%}
 .phonerow input{flex:1;min-width:0}
 #annonsera{margin-top:0}
+.forms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:stretch}
+.forms .news{grid-template-columns:minmax(0,1fr);align-content:start;gap:12px}
+@media (max-width:980px){.forms{grid-template-columns:minmax(0,1fr)}}
 .opt{text-transform:none;letter-spacing:0;font-family:var(--f-body);font-weight:400}
 .consent{grid-column:1/-1;display:flex;gap:8px;align-items:flex-start;font-size:12.5px;color:var(--muted);cursor:pointer}
 .consent input{margin-top:2px;width:16px;height:16px;flex:none}
@@ -312,6 +315,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
     </section>
   </div>
 
+  <div class="forms">
   <section class="news" id="news" aria-labelledby="news-h">
     <div class="news-txt"><h2 id="news-h" data-i18n="news_h">Nyhetsbrev</h2><p data-i18n="news_p">Få nyheter, tips på tävlingar och nya funktioner från Friidrottskartan direkt i inkorgen.</p></div>
     <form id="newsform" novalidate>
@@ -338,6 +342,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
       <div class="nf-row"><button class="btn" type="submit" id="af-btn" data-i18n="af_btn">Skicka förfrågan</button><span id="af-msg" class="nf-msg" role="status"></span></div>
     </form>
   </section>
+  </div>
 
   <footer class="about">
     <h2 data-i18n="about_h">Friidrottstävlingar i Sverige och utomlands</h2>
