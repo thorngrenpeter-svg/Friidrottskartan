@@ -52,6 +52,7 @@ export function splitEvent(n) {
     const d = r[1] ? r[1] + 'x' + r[2] + ' m' : 'Svensk stafett';
     let cls = n.slice(0, r.index).replace(/stafett/ig, '').replace(/[-&]/g, ' ').replace(/\s+/g, ' ').trim().replace(/^([A-ZÅÄÖ]+)\s+(\d+)$/, '$1$2');
     if (/^kvinnor$/i.test(cls)) cls = 'K'; if (/^män$/i.test(cls)) cls = 'M';
+    if (/^(mix\s+)?veteraner\s+kvinnor$/i.test(cls)) cls = 'KV'; else if (/^(mix\s+)?veteraner\s+män$/i.test(cls)) cls = 'MV'; else if (/^mix(ed)?$/i.test(cls)) cls = 'K M';
     return [normMixCls(cls) || 'Öppen', d];
   }
   if (/kamp|prova på|stafett/i.test(n)) return null; // mångkamp jämförs inte
