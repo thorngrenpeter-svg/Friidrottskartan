@@ -359,7 +359,7 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 // Besöksstatistik (Plausible): bara anonyma händelser, inga personuppgifter
-function track(name,props){ try{ if(window.plausible) window.plausible(name,{props}); }catch(e){} }
+function track(name,props,quiet){ try{ if(window.plausible) window.plausible(name,quiet?{props,interactive:false}:{props}); }catch(e){} }
 let LANG=(()=>{ const s=store.get('fk-lang',null); return s&&I18N[s]? s : 'sv'; })(); // svenska som standard, besökaren väljer själv
 const t=(k,...a)=>{ const v=(I18N[LANG][k]!==undefined?I18N[LANG][k]:I18N.sv[k]); return typeof v==='function'? v(...a) : (v===undefined?k:v); };
 const LOC={sv:'sv-SE',en:'en-GB',de:'de-DE',fr:'fr-FR',es:'es-ES',fi:'fi-FI',da:'da-DK'};
@@ -470,6 +470,8 @@ D.cities.forEach(c=>{c[3]=c[3]||'SWE'});
 let TIPS=[];
 fetch('tips.json',{cache:'no-cache'}).then(r=>r.ok?r.json():[]).then(a=>{ const d=new Date().toLocaleDateString('sv-SE'); TIPS=(a||[]).filter(x=>(!x.start||x.start<=d)&&(!x.slut||x.slut>=d)); if(TIPS.length&&proj) render(false,true); }).catch(()=>{});
 const tt=(k,d)=>{ const v=t(k); return v===k?d:v; }; // reservtext om i18n.js är en äldre version
+const tipSeen=new Set();
+const tipObs=('IntersectionObserver' in window)? new IntersectionObserver(es=>es.forEach(e=>{ if(!e.isIntersecting) return; const id=e.target.dataset.tip; tipObs.unobserve(e.target); if(tipSeen.has(id)) return; tipSeen.add(id); track('Tips visning',{namn:id},true); }),{threshold:0.5}) : null;
 const tipFor=n=> TIPS.length? TIPS[n%TIPS.length] : null;
 function tipHTML(x){ if(!x) return '';
   const txt=(x.text&&(x.text[LANG]||x.text.sv))||'';
@@ -807,7 +809,7 @@ function bindPane(){
     if(b.classList.contains('item')) b.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&!e.target.closest('.star')){ e.preventDefault(); go(); } }); });
   pane.querySelectorAll('.star').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); toggleFav(D.comps[+b.dataset.fav]); }));
   pane.querySelectorAll('[data-ics]').forEach(b=>b.addEventListener('click',()=>downloadICS([D.comps[+b.dataset.ics]])));
-  pane.querySelectorAll('[data-tip]').forEach(a=>a.addEventListener('click',()=>track('Tips klick',{namn:a.dataset.tip})));
+  pane.querySelectorAll('[data-tip]').forEach(a=>{ a.addEventListener('click',()=>track('Tips klick',{namn:a.dataset.tip})); if(tipSeen.has(a.dataset.tip)) return; tipObs&&tipObs.observe(a); });
   pane.querySelectorAll('[data-cal]').forEach(a=>a.addEventListener('click',()=>track('Kalender',{typ:a.dataset.cal})));
   pane.querySelectorAll('.links a').forEach(a=>a.addEventListener('click',()=>track('Till källa',{källa:/easyrecord/.test(a.href)?'EasyRecord':/trackandfield/.test(a.href)?'Track & Field':/rosterathletics/.test(a.href)?'Roster Athletics':'Webathletics'})));
   pane.querySelectorAll('.calform').forEach(f=>f.addEventListener('submit',e=>{ e.preventDefault(); sendInvites(f); }));
