@@ -321,6 +321,8 @@ async function geocode(city, co) {
     await sleep(1100); // Nominatims regel: högst 1 anrop per sekund
     if (r.ok) { const j = await r.json(); if (j[0]) { const cc2 = (j[0].address?.country_code || '').toUpperCase(); const a3 = Object.keys(ISO3).find(k => ISO3[k] === cc2) || co; res = [+(+j[0].lat).toFixed(3), +(+j[0].lon).toFixed(3), a3]; } }
   } catch (e) { console.warn(`  geokodning misslyckades för ${city}: ${e.message}`); }
+  // t.ex. "Randers NV" eller "Aarhus C": prova första ordet om hela namnet inte hittades
+  if (!res && /\s/.test(city.trim())) { const first = city.trim().split(/[\s,]+/)[0]; if (first.length > 2) res = await geocode(first, co); }
   geoCache.set(key, res);
   return res;
 }
