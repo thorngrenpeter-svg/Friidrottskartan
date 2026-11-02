@@ -249,6 +249,12 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .caldirect,.fcal{display:flex;gap:6px 12px;flex-wrap:wrap;align-items:center;font-size:12.5px}
 .caldirect a,.caldirect button,.fcal a,.fcal button{color:var(--track);background:none;border:0;padding:0;cursor:pointer;font-weight:600;text-decoration:none;font-size:12.5px}
 .caldirect button:disabled{opacity:.45;cursor:default}
+.tag.disc{border-color:var(--track);color:var(--track);background:var(--track-soft);font-weight:600}
+.field.active select{border:2px solid var(--track);background:var(--track-soft);font-weight:600}
+.ev.hit>summary span:first-child,.ev.hit .evrow span:first-child{color:var(--track);font-weight:700}
+.evrow{display:flex;justify-content:space-between;gap:8px;padding:7px 2px}
+.evrow .n{color:var(--muted);font-size:12.5px;white-space:nowrap}
+#disc{max-width:190px}
 .tipcard{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr);gap:12px;align-items:center;margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);text-decoration:none}
 .tipcard:hover{border-color:var(--track)}
 .tipcard.noimg{grid-template-columns:minmax(0,1fr)}
@@ -287,6 +293,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
     <div class="field"><label for="radius" data-i18n="lbl_radius">Avstånd</label>
       <select id="radius"><option value="25">25 km</option><option value="50">50 km</option><option value="100" selected>100 km</option><option value="200">200 km</option><option value="0" id="opt-all">Hela Sverige</option></select></div>
     <div class="field"><label for="period" data-i18n="lbl_period">Period</label><select id="period"></select></div>
+    <div class="field"><label for="disc" data-i18n="lbl_disc">Gren</label><select id="disc"></select></div>
     <div class="field"><span class="lbl" data-i18n="lbl_arena">Arena</span>
       <div class="chips" role="group">
         <button type="button" class="chip" data-io="all" aria-pressed="true" data-i18n="io_all">Alla</button>
@@ -504,7 +511,7 @@ const clsMatch=(evCls,my)=>{ if(!my) return false; const p=evCls.split(' '); if(
 
 /* ---------- profil: vald klass + PB per klass (bara i webbläsaren) ---------- */
 const saved=store.get('fk-state',{});
-const S={country:saved.country||'SWE', center:null, cityName:'', radius:saved.radius??100, period:'all', io:'all', onlyMine:false, tab:'list', sel:null, focusKey:null, favSel:null};
+const S={country:saved.country||'SWE', center:null, cityName:'', radius:saved.radius??100, period:'all', disc:'all', io:'all', onlyMine:false, tab:'list', sel:null, focusKey:null, favSel:null};
 let profile=store.get('fk-profile',null)||{cls:'',pb:{}};
 profile.pb=profile.pb||{};
 const drafts={}; // ej sparade PB-fält per klass: {klass:{gren:'text'}}
@@ -582,21 +589,30 @@ function fillPeriod(){ $('#period').innerHTML='<option value="all">'+esc(t('opt_
 function fillStamp(){ const src=[['https://easyrecord.se/','EasyRecord'],['https://webathletics.se/','Webathletics'],['https://www.trackandfield.se/','Track &amp; Field'],['https://meets.rosterathletics.com/public/competitions','Roster Athletics']].map(([u,n])=>'<a href="'+u+'" target="_blank" rel="noopener">'+n+'</a>');
   const links=src.slice(0,-1).join(', ')+' '+t('and')+' '+src[src.length-1];
   const [y,m,dd]=D.updated.split('-'); $('#stamp').innerHTML=t('stamp',links,(+dd)+' '+MON[m-1]+' '+y)+' · <a href="integritet.html">'+esc(t('privacy'))+'</a>'; }
-function fillAll(){ fillCountries(); fillMyCls(); fillCities(); fillPeriod(); fillStamp(); updateFavCount(); }
+const hasDisc=(c,d)=>c.e.some(e=>e[1]===d&&(!profile.cls||clsMatch(e[0],profile.cls)));
+function fillDisc(){ const TODAY=new Date().toLocaleDateString('sv-SE');
+  const up=D.comps.filter(c=>c.d2>=TODAY&&(S.country==='all'||c.co===S.country));
+  const all=[...new Set(up.flatMap(c=>c.e.map(e=>e[1])))].sort((a,b)=>{ const ia=DISCS.indexOf(a), ib=DISCS.indexOf(b); return (ia<0?999:ia)-(ib<0?999:ib)||a.localeCompare(b,'sv',{numeric:true}); });
+  const opts=all.map(d=>[d,up.filter(c=>hasDisc(c,d)).length]).filter(x=>x[1]>0||x[0]===S.disc);
+  if(S.disc!=='all'&&!opts.some(x=>x[0]===S.disc)) opts.unshift([S.disc,0]);
+  $('#disc').innerHTML='<option value="all">'+esc(t('opt_alld'))+'</option>'+opts.map(([d,n])=>'<option value="'+esc(d)+'">'+esc(discName(d))+' ('+n+')</option>').join('');
+  $('#disc').value=S.disc; $('#disc').closest('.field').classList.toggle('active',S.disc!=='all'); }
+function fillAll(){ fillCountries(); fillMyCls(); fillCities(); fillPeriod(); fillDisc(); fillStamp(); updateFavCount(); }
 onLang.push(()=>{ fillAll(); setAria(); render(); });
 fillAll();
 $('#radius').value=String(S.radius);
-function setClass(c){ stashPB(); profile.cls=c; saveProfile(); fillMyCls(); if(c) track('Välj klass',{klass:c}); render(); }
+function setClass(c){ stashPB(); profile.cls=c; saveProfile(); fillMyCls(); fillDisc(); if(c) track('Välj klass',{klass:c}); render(); }
 $('#mycls').addEventListener('change',()=>setClass($('#mycls').value));
-$('#country').addEventListener('change',async()=>{ S.country=$('#country').value; S.center=null; S.cityName=''; $('#city').value=''; S.focusKey=null; S.sel=null; fillCities(); store.set('fk-state',{radius:S.radius,country:S.country}); await setBase(S.country); render(true); track('Välj land',{land:S.country}); });
+$('#country').addEventListener('change',async()=>{ S.country=$('#country').value; S.center=null; S.cityName=''; $('#city').value=''; S.focusKey=null; S.sel=null; fillCities(); fillDisc(); store.set('fk-state',{radius:S.radius,country:S.country}); await setBase(S.country); render(true); track('Välj land',{land:S.country}); });
 function findCity(q){ q=q.trim().toLowerCase(); if(!q) return null; const P=cityPool(); let c=P.find(x=>x[0].toLowerCase()===q); if(!c) c=P.find(x=>x[0].toLowerCase().startsWith(q)); if(!c) c=P.find(x=>x[0].toLowerCase().includes(q)); return c; }
 $('#ctl').addEventListener('submit',e=>{e.preventDefault(); applySearch();});
 $('#city').addEventListener('change',applySearch);
 $('#radius').addEventListener('change',()=>{S.radius=+$('#radius').value; store.set('fk-state',{radius:S.radius,city:S.cityName,country:S.country}); render(true);});
 $('#period').addEventListener('change',()=>{S.period=$('#period').value; render();});
+$('#disc').addEventListener('change',()=>{S.disc=$('#disc').value; S.focusKey=null; S.sel=null; S.tab='list'; fillDisc(); render(true); if(S.disc!=='all') track('Välj gren',{gren:S.disc,klass:profile.cls||'–'}); });
 document.querySelectorAll('[data-io]').forEach(b=>b.addEventListener('click',()=>{S.io=b.dataset.io; document.querySelectorAll('[data-io]').forEach(x=>x.setAttribute('aria-pressed',x===b)); render();}));
 $('#onlymine').addEventListener('click',()=>{S.onlyMine=!S.onlyMine; $('#onlymine').setAttribute('aria-pressed',S.onlyMine); render();});
-$('#reset').addEventListener('click',()=>{S.center=null;S.cityName='';$('#city').value='';S.focusKey=null;S.sel=null;store.set('fk-state',{radius:S.radius,country:S.country});render(true);});
+$('#reset').addEventListener('click',()=>{S.center=null;S.cityName='';$('#city').value='';S.focusKey=null;S.sel=null;S.disc='all';fillDisc();store.set('fk-state',{radius:S.radius,country:S.country});render(true);});
 let lastTracked='';
 function applySearch(){ const c=findCity($('#city').value); if(!c){ S.center=null; S.cityName=''; if($('#city').value.trim()) msg=t('not_found',$('#city').value.trim()); render(true); return;}
   $('#city').value=c[0]; S.center=[c[1],c[2]]; S.cityName=c[0]; S.focusKey=null; S.sel=null; S.tab='list'; store.set('fk-state',{radius:S.radius,city:c[0],country:S.country}); render(true); if(lastTracked!==c[0]){ lastTracked=c[0]; track('Sök ort',{ort:c[0]}); } }
@@ -611,6 +627,7 @@ function visible(){
     if(S.period!=='all' && !(c.d1.slice(0,7)<=S.period && c.d2.slice(0,7)>=S.period)) return false;
     if(S.io!=='all' && String(c.i)!==S.io) return false;
     if(S.onlyMine && !hasMyClass(c)) return false;
+    if(S.disc!=='all' && !hasDisc(c,S.disc)) return false;
     c.dist = S.center? km(S.center[0],S.center[1],c.la,c.lo) : null;
     if(S.center && S.radius>0 && c.dist>S.radius) return false;
     return true;
@@ -697,7 +714,7 @@ function rankIn(ev,my){ const d=ev[1]; const marks=ev[4];
   const better = isField(d)? marks.filter(v=>v>my).length : marks.filter(v=>v<my).length;
   return {place:better+1, withPB:marks.length, total:ev[3], marks}; }
 // grenar i tävlingen där man har PB i en av sina klasser
-function myEvents(c){ const out=[]; c.e.forEach(e=>{ const m=myClasses().find(k=>clsMatch(e[0],k)&&pbOf(k)[e[1]]>0); if(m) out.push({ev:e,cls:m,pb:pbOf(m)[e[1]]}); }); return out; }
+function myEvents(c){ const out=[]; c.e.forEach(e=>{ if(!e[3]) return; const m=myClasses().find(k=>clsMatch(e[0],k)&&pbOf(k)[e[1]]>0); if(m) out.push({ev:e,cls:m,pb:pbOf(m)[e[1]]}); }); return out; }
 
 /* ---------- paneler ---------- */
 function calloutHTML(){ return profile.cls||myClasses().length? '' : '<div class="callout"><span class="step" aria-hidden="true">1</span><p>'+esc(t('choose_first'))+'</p><button type="button" class="btn" id="gocls">'+esc(t('choose_btn'))+'</button></div>'; }
@@ -705,6 +722,7 @@ function itemHTML(c){ const dt=fmtDate(c); const mine=[...new Set(c.e.map(e=>mat
   return '<div class="item" role="button" tabindex="0" data-i="'+c.idx+'"><div class="date"><b>'+dt.big+'</b><span>'+dt.small+'</span></div><div><h3>'+esc(c.n)+'</h3><div class="meta">'+esc(c.c)+(c.v?' · '+esc(c.v):'')+(S.country==='all'&&c.co!=='SWE'?' · '+esc(coName(c.co)):'')+'</div><div class="tags">'
    +'<span class="tag">'+(c.i?t('t_in'):t('t_out'))+'</span>'
    +(n?'<span class="tag">'+t('n_entries',n)+'</span>':'<span class="tag">'+t('no_entries')+'</span>')
+   +(S.disc!=='all'?(()=>{ const n=c.e.filter(e=>e[1]===S.disc&&(!profile.cls||clsMatch(e[0],profile.cls))).reduce((a,e)=>a+e[3],0); return '<span class="tag disc">'+esc(discName(S.disc))+(profile.cls?' '+esc(profile.cls):'')+': '+esc(n?t('n_short',n):t('no_entries'))+'</span>'; })():'')
    +(mine.length?'<span class="tag you">'+esc(t('cls_present',mine.join(', ')))+'</span>':'')
    +'<span class="tag src">'+srcLink(c).name+'</span></div></div><div class="iside">'+starBtn(c)+'<span class="dist">'+(c.dist!=null?Math.round(c.dist)+' km':'')+'</span></div></div>'; }
 function paneList(list){
@@ -712,7 +730,8 @@ function paneList(list){
   if(msg){ h+='<p class="summary" style="color:var(--warn)">'+esc(msg)+'</p>'; msg=''; }
   let shown=list;
   if(S.focusKey){ shown=list.filter(c=>c.key===S.focusKey); h+='<p class="summary">'+t('n_comps',shown.length)+' '+esc(t('in_place',shown[0]?.c||''))+' · <button class="back" id="allbtn">'+esc(t('show_all'))+'</button></p>'; }
-  else h+='<p class="summary">'+t('upcoming',list.length)+' '+esc(S.center?(S.radius>0?t('within',S.radius,S.cityName):t('sorted_from',S.cityName)):(S.country==='all'?t('in_all'):S.country==='SWE'?t('in_swe'):t('in_c',coName(S.country))))+'</p>';
+  else h+='<p class="summary">'+t('upcoming',list.length)+(S.disc!=='all'?' '+esc(t('with_disc',discName(S.disc),profile.cls)):'')+' '+esc(S.center?(S.radius>0?t('within',S.radius,S.cityName):t('sorted_from',S.cityName)):(S.country==='all'?t('in_all'):S.country==='SWE'?t('in_swe'):t('in_c',coName(S.country))))+'</p>';
+  if(S.disc!=='all' && !profile.cls) h+='<p class="note" style="margin:-4px 0 8px">'+esc(t('disc_hint'))+'</p>';
   if(S.center && S.radius===0) shown=[...shown].sort((a,b)=>a.dist-b.dist);
   h+= shown.length? '<div class="list">'+shown.map((c,i)=>itemHTML(c)+((i+1)%5===0?tipHTML(tipFor((i+1)/5-1)):'')).join('')+'</div>' : '<p class="empty">'+esc(t('empty_list'))+'</p>';
   return h;
@@ -741,7 +760,9 @@ function paneDetail(c){
     h+='<div class="clsh">'+esc(clsLabel(cls))+(mc?' <span class="tag you">'+esc(t('your_cls'))+(mc!==cls?' · '+mc:'')+'</span>':'')+'</div>';
     evs.forEach(ev=>{ const my=mc?pbOf(mc)[ev[1]]:0; let badge='';
       if(my>0){ const r=rankIn(ev,my); badge=' · <b style="color:var(--you)">'+esc(t('you_place',t('ord',r.place),r.withPB+1))+'</b>'; }
-      h+='<details class="ev"'+(mc?' open':'')+'><summary><span>'+esc(discName(ev[1]))+(ev[2]?' <span class="meta">'+ev[2].slice(5)+'</span>':'')+'</span><span class="n">'+t('n_entered',ev[3])+badge+'</span></summary>'+startlistHTML(ev,mc,my)+'</details>';});
+      const hit=S.disc===ev[1]&&(!profile.cls||clsMatch(cls,profile.cls));
+      if(!ev[3]){ h+='<div class="ev empty-ev'+(hit?' hit':'')+'"><div class="evrow"><span>'+esc(discName(ev[1]))+'</span><span class="n">'+esc(t('no_entries'))+(my>0?' · <b style="color:var(--you)">'+esc(t('you_cls',mc))+' '+fmtMark(my,ev[1])+'</b>':'')+'</span></div></div>'; return; }
+      h+='<details class="ev'+(hit?' hit':'')+'"'+(mc||hit?' open':'')+'><summary><span>'+esc(discName(ev[1]))+(ev[2]?' <span class="meta">'+ev[2].slice(5)+'</span>':'')+'</span><span class="n">'+t('n_entered',ev[3])+badge+'</span></summary>'+startlistHTML(ev,mc,my)+'</details>';});
   });
   h+='<p class="note" style="margin-top:12px">'+esc(t('detail_note',L.name))+'</p>'+tipHTML(tipFor(1))+'</div>';
   return h;

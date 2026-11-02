@@ -40,7 +40,7 @@ const FIELD = ['Höjd', 'Stav', 'Längd', 'Tresteg', 'Kula', 'Diskus', 'Spjut', 
 const DRE = /((?<![\d\p{L}])(?:\d{1,2}\s[05]00|\d{2,5})\s?m(?:\s?häck|\s?hinder|\s?gång)?(?![\p{L}])|1 timme|höjd|stav|längd|tresteg|kula|diskus|spjut|slägga|vikt(?:kastning)?|boll)/iu;
 
 export function splitEvent(n) {
-  if (/kamp|prova på|4x|stafett/i.test(n)) return null; // mångkamp och stafett jämförs inte
+  if (/kamp|prova på|\d\s*x\s*\d|stafett/i.test(n)) return null; // mångkamp och stafett jämförs inte
   const m = n.match(DRE);
   if (!m) return null;
   let d = m[1].replace(/\s+/g, ' ').trim();
@@ -59,7 +59,7 @@ export function splitEvent(n) {
   cls = cls.replace(/^([A-ZÅÄÖ]+)\s+(\d+)$/, '$1$2');
   // veteraner utan åldersgrupp -> KV / MV (sidan matchar t.ex. K45 mot KV)
   // handikappklasser (t.ex. "Öppen klass Para", T44) samlas som Para
-  if (/para|handikapp|funktionsneds|rörelsehind|synskad|intellektuell|\bT(1[1-3]|20|3[1-8]|4[0-7]|5[1-4]|6[1-4])\b/i.test(cls)) cls = 'Para';
+  if (/para|handikapp|funktionsneds|rörelsehind|synskad|intellektuell|frame ?running|race ?running|\bT(1[1-3]|20|3[1-8]|4[0-7]|5[1-4]|6[1-4])\b/i.test(cls)) cls = 'Para';
   else if (/^(mix\s+)?veteraner\s+kvinnor$|^k\s?vet(eraner)?$/i.test(cls)) cls = 'KV';
   else if (/^(mix\s+)?veteraner\s+män$|^m\s?vet(eraner)?$/i.test(cls)) cls = 'MV';
   else if (/^veteraner$/i.test(cls)) cls = 'KV MV';
@@ -85,6 +85,17 @@ function anonEvent(cls, disc, date, marks) {
   return [cls, disc, date, marks.length, pb];
 }
 
+// Grenprogram: lägg till klass+gren som erbjuds men ännu saknar anmälda (antal 0, inga PB)
+function addProgram(e, prog) {
+  const have = new Set(e.map(x => x[0] + '|' + x[1]));
+  for (const [cls, disc] of prog) {
+    const sp = splitEvent(cls + ' ' + disc); if (!sp) continue;
+    const k = sp[0] + '|' + sp[1]; if (have.has(k)) continue;
+    have.add(k); e.push([sp[0], sp[1], '', 0, []]);
+  }
+  return e;
+}
+
 /* ---------- EasyRecord ---------- */
 export function parseErIndex(html) {
   const $ = cheerio.load(html);
@@ -107,7 +118,18 @@ export function parseErInfo(html) {
   const m = t.match(/Datum:\s*(\d{4}-\d{2}-\d{2})(?:\s*-\s*(\d{4}-\d{2}-\d{2}))?/);
   const a = t.match(/Arrangör:\s*([^\n]+)/);
   const r = t.match(/Ordinarie anmälan:\s*(\d{4}-\d{2}-\d{2})/);
-  return { d1: m?.[1], d2: m?.[2] || m?.[1], host: a ? a[1].replace(/Tävlingsledare.*/, '').trim() : '', regClose: r?.[1] || '' };
+  // tabellen "Grenprogram": rubrikrad med klasser, en rad per gren, ifylld cell = grenen finns för klassen
+  const prog = [];
+  $('table').each((_, tb) => {
+    const rows = $(tb).find('tr'); if (rows.length < 2) return;
+    const head = rows.first().children().map((_, c) => $(c).text().trim()).get();
+    if (!head.slice(1).some(h => /^(Kvinnor|Män|[FPKM]\d{1,2}|Veteraner)/.test(h))) return;
+    rows.slice(1).each((_, tr) => {
+      const cells = $(tr).children(); const disc = cells.first().text().trim();
+      cells.slice(1).each((i, td) => { if ($(td).text().trim() && head[i + 1]) prog.push([head[i + 1], disc]); });
+    });
+  });
+  return { d1: m?.[1], d2: m?.[2] || m?.[1], host: a ? a[1].replace(/Tävlingsledare.*/, '').trim() : '', regClose: r?.[1] || '', prog };
 }
 export function parseErStartlist(html) {
   const $ = cheerio.load(html);
@@ -137,6 +159,7 @@ async function scrapeEasyRecord() {
         const sp = splitEvent(n); if (!sp) continue;
         c.e.push(anonEvent(sp[0], sp[1], '', rows.map(r => erMark(r, sp[1]))));
       }
+      addProgram(c.e, c.prog || []);
     } catch (err) { console.warn(`  varning ${c.id} ${c.name}: ${err.message}`); c.e = c.e || []; }
     if (!c.d1) { console.warn(`  hoppar över ${c.id} (saknar datum)`); continue; }
     comps.push({ s: 'er', id: c.id, n: c.name, c: c.city, v: c.loc, la: c.lat, lo: c.lng, d1: c.d1, d2: c.d2, h: c.host, i: c.indoor, r: c.regClose, ro: '', e: c.e });
@@ -155,10 +178,12 @@ async function scrapeWebathletics(cityCoords, venues) {
     try {
       const evs = await get(`${WA_API}/entrylistbyevent/${c.competitionID}`, true);
       for (const ev of evs) {
-        if (ev.is_relay || ev.eventtype === 4 || !ev.entrants?.length) continue; // 4 = mångkamp
+        if (ev.is_relay || ev.eventtype === 4) continue; // 4 = mångkamp
         const sp = splitEvent(ev.eventname); if (!sp) continue;
-        const marks = ev.entrants.filter(a => !a.declined).map(a => a.PB ? +(a.PB / 100).toFixed(2) : 0);
-        if (marks.length) e.push(anonEvent(sp[0], sp[1], ev.sdate && !(c.first_date === c.last_date) ? ev.sdate : '', marks));
+        const marks = (ev.entrants || []).filter(a => !a.declined).map(a => a.PB ? +(a.PB / 100).toFixed(2) : 0);
+        const date = ev.sdate && !(c.first_date === c.last_date) ? ev.sdate : '';
+        if (marks.length) e.push(anonEvent(sp[0], sp[1], date, marks));
+        else if (!e.some(x => x[0] === sp[0] && x[1] === sp[1])) e.push([sp[0], sp[1], date, 0, []]); // grenen finns men ingen anmäld än
       }
     } catch (err) { console.warn(`  varning wa ${c.competitionID} ${c.name}: ${err.message}`); }
     const loc = (c.location || '').trim();
@@ -234,7 +259,12 @@ export function parseTfInfo(html) {
   const $ = cheerio.load(html); $('script,style').remove();
   const t = $('body').text().replace(/\u00a0/g, ' ');
   const g = re => { const m = t.match(re); return m ? m[1].trim() : ''; };
-  return { city: g(/Ort:\s*([^\n]+)/), venue: g(/Arena:\s*([^\n]+)/), host: g(/Arrangör:\s*([^\n]*)/).replace(/^Kontakt.*$/, ''), nation: g(/Nation:\s*([A-Z]{3})/), reg: g(/Anmäl senast:\s*([^\n]+)/) };
+  const prog = [];
+  $('.event-card').each((_, card) => {
+    const cls = $(card).find('.event-class').first().text().trim();
+    $(card).find('.event-disciplines').each((_, d) => $(d).text().split(',').map(x => x.trim()).filter(Boolean).forEach(x => prog.push([cls, x])));
+  });
+  return { prog, city: g(/Ort:\s*([^\n]+)/), venue: g(/Arena:\s*([^\n]+)/), host: g(/Arrangör:\s*([^\n]*)/).replace(/^Kontakt.*$/, ''), nation: g(/Nation:\s*([A-Z]{3})/), reg: g(/Anmäl senast:\s*([^\n]+)/) };
 }
 export function parseTfEntries(html) {
   const $ = cheerio.load(html); const evs = [];
@@ -265,6 +295,7 @@ async function scrapeTrackAndField(cityCoords) {
         const sp = splitEvent(n); if (!sp) continue;
         e.push(anonEvent(sp[0], sp[1], '', pbs.map(p => tfMark(p, sp[1]))));
       }
+      addProgram(e, info.prog || []);
       const hit = resolve(info.city, info.venue, head.name);
       if (!hit) { console.warn(`  T&F: okänd ort "${info.city}" för ${head.name}`); continue; }
       const [city, cc] = hit;
@@ -299,6 +330,19 @@ const RO = 'https://api.meets.rosterathletics.com/api/public';
 const RO_EVENTS = [[/^(\d+)m Hurdles$/i, m => fmtDist(m[1]) + ' häck'], [/^(\d+)m Steeplechase$/i, m => fmtDist(m[1]) + ' hinder'], [/^(\d+)m Race ?Walk$/i, m => fmtDist(m[1]) + ' gång'], [/^(\d+)m$/i, m => fmtDist(m[1])],
   [/^High Jump/i, () => 'Höjd'], [/^Pole Vault/i, () => 'Stav'], [/^Long Jump/i, () => 'Längd'], [/^Triple Jump/i, () => 'Tresteg'], [/^Shot Put/i, () => 'Kula'], [/^Discus/i, () => 'Diskus'], [/^Javelin/i, () => 'Spjut'], [/^Hammer/i, () => 'Slägga'], [/^Weight Throw/i, () => 'Viktkastning'], [/^Ball Throw/i, () => 'Boll']];
 function fmtDist(n) { n = String(n); return (n.length > 3 ? n.slice(0, -3) + ' ' + n.slice(-3) : n) + ' m'; }
+// Roster: svensk klass från åldersgrupp och kön, för grenar som ännu saknar deltagare
+const ageCls = a => a <= 15 ? a : a <= 17 ? 17 : 19;
+export function roClasses(a, gender, label) {
+  const sexes = gender === 'Female' ? ['F'] : gender === 'Male' ? ['P'] : ['F', 'P'];
+  const adult = x => x === 'F' ? 'K' : 'M';
+  if (/para|frame ?running|race ?running/i.test((label || '') + ' ' + (a.name || ''))) return 'Para';
+  if (/vet/i.test(label || '')) return sexes.map(x => adult(x) + 'V').join(' ');
+  const lo = +a.rangeStart || 0, hi = +a.rangeEnd || 0;
+  if (lo >= 7 && hi < 20 && hi >= lo) { const ages = [...new Set(Array.from({ length: hi - lo + 1 }, (_, i) => ageCls(lo + i)))]; return sexes.flatMap(x => ages.map(n => x + n)).join(' '); }
+  if (lo >= 35) return sexes.map(x => adult(x) + Math.min(90, Math.floor(lo / 5) * 5)).join(' ');
+  if (a.category === 'Senior' || /senior/i.test(a.name || '')) return sexes.map(adult).join(' ');
+  return null; // öppen klass utan åldersgräns: okänt
+}
 export function roDisc(name) { for (const [re, f] of RO_EVENTS) { const m = name.match(re); if (m) return f(m); } return null; }
 async function post(url, body) {
   for (let i = 0; i < 3; i++) {
@@ -334,10 +378,12 @@ async function scrapeRoster(cityCoords) {
       const ag = Object.fromEntries((d.ageGroups || []).map(x => [x.ageGroupIdPk, x]));
       const sch = await get(`${RO}/meeting/${m.meetingId}/schedule`, true);
       const groups = new Map(); // "klass|gren" -> Map(athleteId -> pb)
+      const program = []; // grenar utan deltagare än
       for (const { entityDto: ev } of sch.data || []) {
-        if (!ev?.hasParticipants) continue;
+        if (!ev) continue;
         const s = se[ev.eventIdFk]; if (!s || s.relay || s.combined) continue;
         const disc = roDisc(s.eventName); if (!disc) continue;
+        if (!ev.hasParticipants) { const cls = roClasses(ag[ev.ageGroupIdFk] || {}, ev.gender, ev.label); if (cls) program.push([cls, disc]); continue; }
         const res = await get(`${RO}/meeting/${m.meetingId}/results-v2/${ev.meetingEventIdPk}`, true);
         const gender = Object.fromEntries((res.athleteList || []).map(a => [a.athleteIdPk, a.gender]));
         // födelseår används bara här för att räkna fram svensk åldersklass och sparas aldrig
@@ -347,7 +393,7 @@ async function scrapeRoster(cityCoords) {
           if (!p || p.startStatus === 'Scratched' || p.startStatus === 'DNS') continue;
           const g = ev.gender === 'Mixed' ? gender[p.athleteIdFk] : ev.gender;
           let cls;
-          const para = /para|handikapp|funktionsneds|rörelsehind|synskad|intellektuell|\bT(1[1-3]|20|3[1-8]|4[0-7]|5[1-4]|6[1-4])\b/i.test((ev.label || '') + ' ' + (a.name || ''));
+          const para = /para|handikapp|funktionsneds|rörelsehind|synskad|intellektuell|frame ?running|race ?running|\bT(1[1-3]|20|3[1-8]|4[0-7]|5[1-4]|6[1-4])\b/i.test((ev.label || '') + ' ' + (a.name || ''));
           const age = yob[p.athleteIdFk] ? year - yob[p.athleteIdFk] : 0;
           if (para) cls = 'Para';
           else if (age >= 7 && age <= 110) cls = age >= 35 ? (g === 'Female' ? 'K' : 'M') + Math.min(90, Math.floor(age / 5) * 5) : age >= 20 ? (g === 'Female' ? 'K' : 'M') : (g === 'Female' ? 'F' : 'P') + (age <= 15 ? age : age <= 17 ? 17 : 19);
@@ -363,6 +409,7 @@ async function scrapeRoster(cityCoords) {
         }
       }
       const e = [...groups].map(([k, gm]) => { const [cls, disc] = k.split('|'); return anonEvent(cls, disc, '', [...gm.values()]); });
+      addProgram(e, program);
       const co = d.address?.countryCode || m.countryCode || 'SWE';
       const rawCity = (d.address?.city || m.city || '').trim();
       let city, la, lo, cc3 = /^[A-Z]{3}$/.test(co) && iso2(co) ? co : '';
