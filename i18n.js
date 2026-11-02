@@ -22,6 +22,7 @@ const pl = (n, one, many) => n + ' ' + (n === 1 ? one : many);
 window.I18N = {
   /* ------------------------------------------------ SVENSKA */
   sv: {
+    n_teams: n => n + ' lag',
     lbl_disc: 'Gren', opt_alld: 'Alla grenar', with_disc: (d, c) => 'med ' + d + (c ? ' för ' + c : ''), disc_hint: 'Tips: välj din klass överst, så visas bara tävlingar där grenen finns i din klass.',
     tip_label: 'Tips från oss', ad_label: 'Annons', tip_cta_yt: 'Se på YouTube', tip_cta: 'Läs mer',
     ad_h: 'Annonsera hos oss', ad_p: 'Vill ditt företag eller din förening synas på Friidrottskartan? Lämna dina uppgifter så kontaktar vi dig med paket och priser.', af_org: 'Företag/förening', af_phone: 'Telefon', af_cc: 'Landskod', af_btn: 'Skicka förfrågan', af_ok: 'Tack! Vi hör av oss inom ett par dagar.', af_invalid: 'Fyll i namn, företag/förening och en giltig e-postadress. Telefonnumret måste vara giltigt om du fyller i det.', af_mail: 'Skicka förfrågan via e-post i stället', af_note: l => 'Vi använder uppgifterna bara för att svara på din förfrågan. Läs mer i ' + l + '.',
@@ -83,6 +84,7 @@ window.I18N = {
   },
   /* ------------------------------------------------ ENGLISH */
   en: {
+    n_teams: n => n + ' ' + (n === 1 ? 'team' : 'teams'),
     lbl_disc: 'Event', opt_alld: 'All events', with_disc: (d, c) => 'with ' + d + (c ? ' for ' + c : ''), disc_hint: 'Tip: choose your class at the top to only see meets where the event is held in your class.',
     tip_label: 'Our tip', ad_label: 'Ad', tip_cta_yt: 'Watch on YouTube', tip_cta: 'Read more',
     ad_h: 'Advertise with us', ad_p: 'Would your company or club like to be seen on Friidrottskartan? Leave your details and we will contact you with packages and prices.', af_org: 'Company/club', af_phone: 'Phone', af_cc: 'Country code', af_btn: 'Send enquiry', af_ok: 'Thanks! We will get back to you within a couple of days.', af_invalid: 'Fill in your name, company/club and a valid email address. The phone number must be valid if you enter one.', af_mail: 'Send the enquiry by email instead', af_note: l => 'We only use your details to reply to your enquiry. Read more in our ' + l + '.',
@@ -139,12 +141,13 @@ window.I18N = {
     nf_policy: 'privacy policy', nf_btn: 'Subscribe', nf_sending: 'Sending…', nf_ok: 'Thanks! You are now subscribed to the newsletter.',
     nf_err: 'It could not be sent right now.', nf_activate: 'The form is being activated. Please try again in a little while.', nf_mail: 'Send your sign-up by email instead', nf_invalid: 'Fill in first name, last name, email and tick the box.',
     load_err: 'Could not load the meet data. Please reload the page in a moment.',
-    disc: { 'Höjd': 'High jump', 'Stav': 'Pole vault', 'Längd': 'Long jump', 'Tresteg': 'Triple jump', 'Kula': 'Shot put', 'Diskus': 'Discus', 'Spjut': 'Javelin', 'Slägga': 'Hammer', 'Viktkastning': 'Weight throw', 'Boll': 'Ball throw', '1 timme': '1 hour' },
+    disc: { 'Svensk stafett': 'Swedish relay', 'Höjd': 'High jump', 'Stav': 'Pole vault', 'Längd': 'Long jump', 'Tresteg': 'Triple jump', 'Kula': 'Shot put', 'Diskus': 'Discus', 'Spjut': 'Javelin', 'Slägga': 'Hammer', 'Viktkastning': 'Weight throw', 'Boll': 'Ball throw', '1 timme': '1 hour' },
     hurdles: 'hurdles', steeple: 'steeplechase', walk: 'race walk',
     ord: n => n + (n % 100 >= 11 && n % 100 <= 13 ? 'th' : ['th', 'st', 'nd', 'rd'][n % 10] || 'th')
   },
   /* ------------------------------------------------ DEUTSCH */
   de: {
+    n_teams: n => n + ' ' + (n === 1 ? 'Staffel' : 'Staffeln'),
     lbl_disc: 'Disziplin', opt_alld: 'Alle Disziplinen', with_disc: (d, c) => 'mit ' + d + (c ? ' für ' + c : ''), disc_hint: 'Tipp: Wähle oben deine Klasse, dann siehst du nur Wettkämpfe, bei denen die Disziplin in deiner Klasse angeboten wird.',
     tip_label: 'Unser Tipp', ad_label: 'Anzeige', tip_cta_yt: 'Auf YouTube ansehen', tip_cta: 'Mehr erfahren',
     ad_h: 'Werben bei uns', ad_p: 'Möchte dein Unternehmen oder Verein auf Friidrottskartan sichtbar sein? Hinterlasse deine Angaben, dann melden wir uns mit Paketen und Preisen.', af_org: 'Unternehmen/Verein', af_phone: 'Telefon', af_cc: 'Ländervorwahl', af_btn: 'Anfrage senden', af_ok: 'Danke! Wir melden uns innerhalb weniger Tage.', af_invalid: 'Bitte gib Namen, Unternehmen/Verein und eine gültige E-Mail-Adresse an. Die Telefonnummer muss gültig sein, wenn du eine angibst.', af_mail: 'Anfrage stattdessen per E-Mail senden', af_note: l => 'Wir verwenden deine Angaben nur, um auf deine Anfrage zu antworten. Mehr dazu in der ' + l + '.',
@@ -201,12 +204,13 @@ window.I18N = {
     nf_policy: 'Datenschutzerklärung', nf_btn: 'Abonnieren', nf_sending: 'Wird gesendet…', nf_ok: 'Danke! Du bist jetzt für den Newsletter angemeldet.',
     nf_err: 'Das Senden hat gerade nicht geklappt.', nf_activate: 'Das Formular wird gerade aktiviert. Bitte versuche es gleich noch einmal.', nf_mail: 'Anmeldung stattdessen per E-Mail senden', nf_invalid: 'Bitte Vorname, Nachname und E-Mail ausfüllen und das Kästchen ankreuzen.',
     load_err: 'Die Wettkampfdaten konnten nicht geladen werden. Bitte lade die Seite gleich neu.',
-    disc: { 'Höjd': 'Hochsprung', 'Stav': 'Stabhochsprung', 'Längd': 'Weitsprung', 'Tresteg': 'Dreisprung', 'Kula': 'Kugelstoßen', 'Diskus': 'Diskuswurf', 'Spjut': 'Speerwurf', 'Slägga': 'Hammerwurf', 'Viktkastning': 'Gewichtwurf', 'Boll': 'Ballwurf', '1 timme': '1 Stunde' },
+    disc: { 'Svensk stafett': 'Schwedenstaffel', 'Höjd': 'Hochsprung', 'Stav': 'Stabhochsprung', 'Längd': 'Weitsprung', 'Tresteg': 'Dreisprung', 'Kula': 'Kugelstoßen', 'Diskus': 'Diskuswurf', 'Spjut': 'Speerwurf', 'Slägga': 'Hammerwurf', 'Viktkastning': 'Gewichtwurf', 'Boll': 'Ballwurf', '1 timme': '1 Stunde' },
     hurdles: 'Hürden', steeple: 'Hindernis', walk: 'Gehen',
     ord: n => n + '.'
   },
   /* ------------------------------------------------ FRANÇAIS */
   fr: {
+    n_teams: n => n + ' ' + (n === 1 ? 'équipe' : 'équipes'),
     lbl_disc: 'Épreuve', opt_alld: 'Toutes les épreuves', with_disc: (d, c) => 'avec ' + d + (c ? ' pour ' + c : ''), disc_hint: 'Astuce : choisis ta catégorie en haut pour ne voir que les compétitions où l’épreuve existe dans ta catégorie.',
     tip_label: 'Notre conseil', ad_label: 'Publicité', tip_cta_yt: 'Voir sur YouTube', tip_cta: 'En savoir plus',
     ad_h: 'Faire de la publicité', ad_p: 'Ton entreprise ou ton club souhaite être visible sur Friidrottskartan ? Laisse tes coordonnées et nous te contacterons avec nos offres et nos tarifs.', af_org: 'Entreprise/club', af_phone: 'Téléphone', af_cc: 'Indicatif pays', af_btn: 'Envoyer la demande', af_ok: 'Merci ! Nous te répondrons d’ici quelques jours.', af_invalid: 'Indique ton nom, ton entreprise/club et une adresse e-mail valide. Le numéro de téléphone doit être valide si tu en saisis un.', af_mail: 'Envoyer la demande par e-mail', af_note: l => 'Nous utilisons tes données uniquement pour répondre à ta demande. En savoir plus dans la ' + l + '.',
@@ -263,12 +267,13 @@ window.I18N = {
     nf_policy: 'politique de confidentialité', nf_btn: 'S’abonner', nf_sending: 'Envoi…', nf_ok: 'Merci ! Tu es maintenant inscrit(e) à la newsletter.',
     nf_err: 'L’envoi n’a pas fonctionné pour le moment.', nf_activate: 'Le formulaire est en cours d’activation. Réessaie dans un petit moment.', nf_mail: 'Envoyer l’inscription par e-mail', nf_invalid: 'Remplis le prénom, le nom et l’e-mail, et coche la case.',
     load_err: 'Impossible de charger les données. Recharge la page dans un instant.',
-    disc: { 'Höjd': 'Saut en hauteur', 'Stav': 'Saut à la perche', 'Längd': 'Saut en longueur', 'Tresteg': 'Triple saut', 'Kula': 'Lancer du poids', 'Diskus': 'Lancer du disque', 'Spjut': 'Lancer du javelot', 'Slägga': 'Lancer du marteau', 'Viktkastning': 'Lancer du poids lourd', 'Boll': 'Lancer de balle', '1 timme': '1 heure' },
+    disc: { 'Svensk stafett': 'Relais suédois', 'Höjd': 'Saut en hauteur', 'Stav': 'Saut à la perche', 'Längd': 'Saut en longueur', 'Tresteg': 'Triple saut', 'Kula': 'Lancer du poids', 'Diskus': 'Lancer du disque', 'Spjut': 'Lancer du javelot', 'Slägga': 'Lancer du marteau', 'Viktkastning': 'Lancer du poids lourd', 'Boll': 'Lancer de balle', '1 timme': '1 heure' },
     hurdles: 'haies', steeple: 'steeple', walk: 'marche',
     ord: n => n === 1 ? '1er' : n + 'e'
   },
   /* ------------------------------------------------ ESPAÑOL */
   es: {
+    n_teams: n => n + ' ' + (n === 1 ? 'equipo' : 'equipos'),
     lbl_disc: 'Prueba', opt_alld: 'Todas las pruebas', with_disc: (d, c) => 'con ' + d + (c ? ' para ' + c : ''), disc_hint: 'Consejo: elige tu categoría arriba para ver solo competiciones donde la prueba existe en tu categoría.',
     tip_label: 'Nuestra recomendación', ad_label: 'Anuncio', tip_cta_yt: 'Ver en YouTube', tip_cta: 'Más información',
     ad_h: 'Anúnciate con nosotros', ad_p: '¿Quiere tu empresa o tu club aparecer en Friidrottskartan? Déjanos tus datos y te contactaremos con paquetes y precios.', af_org: 'Empresa/club', af_phone: 'Teléfono', af_cc: 'Prefijo del país', af_btn: 'Enviar solicitud', af_ok: '¡Gracias! Te responderemos en un par de días.', af_invalid: 'Rellena nombre, empresa/club y un correo válido. El teléfono debe ser válido si lo indicas.', af_mail: 'Enviar la solicitud por correo', af_note: l => 'Solo usamos tus datos para responder a tu solicitud. Más información en la ' + l + '.',
@@ -325,12 +330,13 @@ window.I18N = {
     nf_policy: 'política de privacidad', nf_btn: 'Suscribirme', nf_sending: 'Enviando…', nf_ok: '¡Gracias! Ya estás suscrito al boletín.',
     nf_err: 'No se pudo enviar ahora mismo.', nf_activate: 'El formulario se está activando. Inténtalo de nuevo en un rato.', nf_mail: 'Enviar la suscripción por correo', nf_invalid: 'Rellena nombre, apellido y correo, y marca la casilla.',
     load_err: 'No se pudieron cargar los datos. Recarga la página en un momento.',
-    disc: { 'Höjd': 'Salto de altura', 'Stav': 'Salto con pértiga', 'Längd': 'Salto de longitud', 'Tresteg': 'Triple salto', 'Kula': 'Lanzamiento de peso', 'Diskus': 'Lanzamiento de disco', 'Spjut': 'Lanzamiento de jabalina', 'Slägga': 'Lanzamiento de martillo', 'Viktkastning': 'Lanzamiento de peso pesado', 'Boll': 'Lanzamiento de pelota', '1 timme': '1 hora' },
+    disc: { 'Svensk stafett': 'Relevo sueco', 'Höjd': 'Salto de altura', 'Stav': 'Salto con pértiga', 'Längd': 'Salto de longitud', 'Tresteg': 'Triple salto', 'Kula': 'Lanzamiento de peso', 'Diskus': 'Lanzamiento de disco', 'Spjut': 'Lanzamiento de jabalina', 'Slägga': 'Lanzamiento de martillo', 'Viktkastning': 'Lanzamiento de peso pesado', 'Boll': 'Lanzamiento de pelota', '1 timme': '1 hora' },
     hurdles: 'vallas', steeple: 'obstáculos', walk: 'marcha',
     ord: n => n + '.º'
   },
   /* ------------------------------------------------ SUOMI */
   fi: {
+    n_teams: n => n + ' ' + (n === 1 ? 'joukkue' : 'joukkuetta'),
     lbl_disc: 'Laji', opt_alld: 'Kaikki lajit', with_disc: (d, c) => '– ' + d + (c ? ', ' + c : ''), disc_hint: 'Vinkki: valitse sarjasi ylhäältä, niin näet vain kilpailut, joissa laji on sarjassasi.',
     tip_label: 'Vinkkimme', ad_label: 'Mainos', tip_cta_yt: 'Katso YouTubessa', tip_cta: 'Lue lisää',
     ad_h: 'Mainosta meillä', ad_p: 'Haluaako yrityksesi tai seurasi näkyä Friidrottskartanissa? Jätä tietosi, niin otamme yhteyttä ja kerromme paketeista ja hinnoista.', af_org: 'Yritys/seura', af_phone: 'Puhelin', af_cc: 'Maatunnus', af_btn: 'Lähetä tiedustelu', af_ok: 'Kiitos! Palaamme asiaan parin päivän sisällä.', af_invalid: 'Täytä nimi, yritys/seura ja kelvollinen sähköpostiosoite. Puhelinnumeron on oltava kelvollinen, jos annat sen.', af_mail: 'Lähetä tiedustelu sähköpostilla', af_policy: 'tietosuojaseloste', af_note: l => 'Käytämme tietoja vain tiedusteluusi vastaamiseen. Lue lisää: ' + l + '.',
@@ -386,12 +392,13 @@ window.I18N = {
     nf_policy: 'tietosuojaselosteen', nf_btn: 'Tilaa', nf_sending: 'Lähetetään…', nf_ok: 'Kiitos! Olet nyt tilannut uutiskirjeen.',
     nf_err: 'Lähettäminen ei onnistunut juuri nyt.', nf_activate: 'Lomaketta aktivoidaan. Yritä hetken kuluttua uudelleen.', nf_mail: 'Lähetä tilaus sähköpostilla', nf_invalid: 'Täytä etunimi, sukunimi ja sähköposti ja rastita ruutu.', nf_invalid_mail: 'Kirjoita kelvollinen sähköpostiosoite.',
     load_err: 'Kilpailutietoja ei voitu ladata. Lataa sivu uudelleen hetken kuluttua.',
-    disc: { 'Höjd': 'Korkeushyppy', 'Stav': 'Seiväshyppy', 'Längd': 'Pituushyppy', 'Tresteg': 'Kolmiloikka', 'Kula': 'Kuulantyöntö', 'Diskus': 'Kiekonheitto', 'Spjut': 'Keihäänheitto', 'Slägga': 'Moukarinheitto', 'Viktkastning': 'Painonheitto', 'Boll': 'Pallonheitto', '1 timme': 'Tunnin juoksu' },
+    disc: { 'Svensk stafett': 'Ruotsalaisviesti', 'Höjd': 'Korkeushyppy', 'Stav': 'Seiväshyppy', 'Längd': 'Pituushyppy', 'Tresteg': 'Kolmiloikka', 'Kula': 'Kuulantyöntö', 'Diskus': 'Kiekonheitto', 'Spjut': 'Keihäänheitto', 'Slägga': 'Moukarinheitto', 'Viktkastning': 'Painonheitto', 'Boll': 'Pallonheitto', '1 timme': 'Tunnin juoksu' },
     hurdles: 'aidat', steeple: 'estejuoksu', walk: 'kävely',
     ord: n => n + '.'
   },
   /* ------------------------------------------------ DANSK */
   da: {
+    n_teams: n => n + ' hold',
     lbl_disc: 'Disciplin', opt_alld: 'Alle discipliner', with_disc: (d, c) => 'med ' + d + (c ? ' for ' + c : ''), disc_hint: 'Tip: vælg din klasse øverst, så ser du kun stævner, hvor disciplinen findes i din klasse.',
     tip_label: 'Vores tip', ad_label: 'Annonce', tip_cta_yt: 'Se på YouTube', tip_cta: 'Læs mere',
     ad_h: 'Annoncér hos os', ad_p: 'Vil din virksomhed eller klub være synlig på Friidrottskartan? Skriv dine oplysninger, så kontakter vi dig med pakker og priser.', af_org: 'Virksomhed/klub', af_phone: 'Telefon', af_cc: 'Landekode', af_btn: 'Send forespørgsel', af_ok: 'Tak! Vi vender tilbage inden for et par dage.', af_invalid: 'Udfyld navn, virksomhed/klub og en gyldig e-mailadresse. Telefonnummeret skal være gyldigt, hvis du skriver et.', af_mail: 'Send forespørgslen via e-mail i stedet', af_note: l => 'Vi bruger kun oplysningerne til at besvare din forespørgsel. Læs mere i ' + l + '.',
@@ -447,7 +454,7 @@ window.I18N = {
     nf_policy: 'privatlivspolitikken', nf_btn: 'Tilmeld', nf_sending: 'Sender…', nf_ok: 'Tak! Du er nu tilmeldt nyhedsbrevet.',
     nf_err: 'Det kunne ikke sendes lige nu.', nf_activate: 'Formularen er ved at blive aktiveret. Prøv igen om lidt.', nf_mail: 'Send tilmeldingen via e-mail i stedet', nf_invalid: 'Udfyld fornavn, efternavn og e-mail, og sæt kryds i feltet.', nf_invalid_mail: 'Skriv en gyldig e-mailadresse.',
     load_err: 'Stævnedataene kunne ikke indlæses. Genindlæs siden om lidt.',
-    disc: { 'Höjd': 'Højdespring', 'Stav': 'Stangspring', 'Längd': 'Længdespring', 'Tresteg': 'Trespring', 'Kula': 'Kuglestød', 'Diskus': 'Diskoskast', 'Spjut': 'Spydkast', 'Slägga': 'Hammerkast', 'Viktkastning': 'Vægtkast', 'Boll': 'Boldkast', '1 timme': '1 time' },
+    disc: { 'Svensk stafett': 'Svensk stafet', 'Höjd': 'Højdespring', 'Stav': 'Stangspring', 'Längd': 'Længdespring', 'Tresteg': 'Trespring', 'Kula': 'Kuglestød', 'Diskus': 'Diskoskast', 'Spjut': 'Spydkast', 'Slägga': 'Hammerkast', 'Viktkastning': 'Vægtkast', 'Boll': 'Boldkast', '1 timme': '1 time' },
     hurdles: 'hæk', steeple: 'forhindring', walk: 'gang',
     ord: n => n + '.'
   }

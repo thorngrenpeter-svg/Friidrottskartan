@@ -39,8 +39,22 @@ async function get(url, asJson = false) {
 const FIELD = ['Höjd', 'Stav', 'Längd', 'Tresteg', 'Kula', 'Diskus', 'Spjut', 'Slägga', 'Viktkastning', 'Boll'];
 const DRE = /((?<![\d\p{L}])(?:\d{1,2}\s[05]00|\d{2,5})\s?m(?:\s?häck|\s?hinder|\s?gång)?(?![\p{L}])|1 timme|höjd|stav|längd|tresteg|kula|diskus|spjut|slägga|vikt(?:kastning)?|boll)/iu;
 
+const RELAY = /(\d)\s*[x×]\s*(\d{2,4})\s?m|svensk[a]?\s*stafett|sverigestafett/i;
+export const isRelay = d => /^\d+x\d+ m$|^Svensk stafett$/.test(d);
+function normMixCls(cls) { // PF17 / FP17 / "P/F17" -> "F17 P17"
+  const m = cls.match(/^(?:PF|FP|P\/F|F\/P)\s?(\d{1,2})$/i); return m ? 'F' + m[1] + ' P' + m[1] : cls;
+}
 export function splitEvent(n) {
-  if (/kamp|prova på|\d\s*x\s*\d|stafett/i.test(n)) return null; // mångkamp och stafett jämförs inte
+  // stafett: egen gren, bara antal lag (inga PB)
+  const r = n.match(RELAY);
+  if (r) {
+    if (/kamp/i.test(n)) return null;
+    const d = r[1] ? r[1] + 'x' + r[2] + ' m' : 'Svensk stafett';
+    let cls = n.slice(0, r.index).replace(/stafett/ig, '').replace(/[-&]/g, ' ').replace(/\s+/g, ' ').trim().replace(/^([A-ZÅÄÖ]+)\s+(\d+)$/, '$1$2');
+    if (/^kvinnor$/i.test(cls)) cls = 'K'; if (/^män$/i.test(cls)) cls = 'M';
+    return [normMixCls(cls) || 'Öppen', d];
+  }
+  if (/kamp|prova på|stafett/i.test(n)) return null; // mångkamp jämförs inte
   const m = n.match(DRE);
   if (!m) return null;
   let d = m[1].replace(/\s+/g, ' ').trim();
@@ -56,7 +70,7 @@ export function splitEvent(n) {
   }
   if (/^kvinnor$/i.test(cls)) cls = 'K';
   if (/^män$/i.test(cls)) cls = 'M';
-  cls = cls.replace(/^([A-ZÅÄÖ]+)\s+(\d+)$/, '$1$2');
+  cls = normMixCls(cls.replace(/^([A-ZÅÄÖ]+)\s+(\d+)$/, '$1$2'));
   // veteraner utan åldersgrupp -> KV / MV (sidan matchar t.ex. K45 mot KV)
   // handikappklasser (t.ex. "Öppen klass Para", T44) samlas som Para
   if (/para|handikapp|funktionsneds|rörelsehind|synskad|intellektuell|frame ?running|race ?running|\bT(1[1-3]|20|3[1-8]|4[0-7]|5[1-4]|6[1-4])\b/i.test(cls)) cls = 'Para';
@@ -81,6 +95,7 @@ export function erMark(s, d) {
 
 // En gren = [klass, gren, datum, antal anmälda, sorterade PB (bäst först)]
 function anonEvent(cls, disc, date, marks) {
+  if (isRelay(disc)) return [cls, disc, date, marks.length, []];
   const pb = marks.filter(v => v > 0).sort((a, b) => isField(disc) ? b - a : a - b);
   return [cls, disc, date, marks.length, pb];
 }
@@ -178,7 +193,7 @@ async function scrapeWebathletics(cityCoords, venues) {
     try {
       const evs = await get(`${WA_API}/entrylistbyevent/${c.competitionID}`, true);
       for (const ev of evs) {
-        if (ev.is_relay || ev.eventtype === 4) continue; // 4 = mångkamp
+        if (ev.eventtype === 4) continue; // 4 = mångkamp (stafetter tas med som antal lag)
         const sp = splitEvent(ev.eventname); if (!sp) continue;
         const marks = (ev.entrants || []).filter(a => !a.declined).map(a => a.PB ? +(a.PB / 100).toFixed(2) : 0);
         const date = ev.sdate && !(c.first_date === c.last_date) ? ev.sdate : '';
@@ -329,7 +344,7 @@ async function geocode(city, co) {
 
 /* ---------- Roster Athletics (öppet JSON-gränssnitt) ---------- */
 const RO = 'https://api.meets.rosterathletics.com/api/public';
-const RO_EVENTS = [[/^(\d+)m Hurdles$/i, m => fmtDist(m[1]) + ' häck'], [/^(\d+)m Steeplechase$/i, m => fmtDist(m[1]) + ' hinder'], [/^(\d+)m Race ?Walk$/i, m => fmtDist(m[1]) + ' gång'], [/^(\d+)m$/i, m => fmtDist(m[1])],
+const RO_EVENTS = [[/^(\d)\s*x\s*(\d+)m/i, m => m[1] + 'x' + m[2] + ' m'], [/^Swedish Relay|^Svensk/i, () => 'Svensk stafett'], [/^(\d+)m Hurdles$/i, m => fmtDist(m[1]) + ' häck'], [/^(\d+)m Steeplechase$/i, m => fmtDist(m[1]) + ' hinder'], [/^(\d+)m Race ?Walk$/i, m => fmtDist(m[1]) + ' gång'], [/^(\d+)m$/i, m => fmtDist(m[1])],
   [/^High Jump/i, () => 'Höjd'], [/^Pole Vault/i, () => 'Stav'], [/^Long Jump/i, () => 'Längd'], [/^Triple Jump/i, () => 'Tresteg'], [/^Shot Put/i, () => 'Kula'], [/^Discus/i, () => 'Diskus'], [/^Javelin/i, () => 'Spjut'], [/^Hammer/i, () => 'Slägga'], [/^Weight Throw/i, () => 'Viktkastning'], [/^Ball Throw/i, () => 'Boll']];
 function fmtDist(n) { n = String(n); return (n.length > 3 ? n.slice(0, -3) + ' ' + n.slice(-3) : n) + ' m'; }
 // Roster: svensk klass från åldersgrupp och kön, för grenar som ännu saknar deltagare
@@ -383,9 +398,9 @@ async function scrapeRoster(cityCoords) {
       const program = []; // grenar utan deltagare än
       for (const { entityDto: ev } of sch.data || []) {
         if (!ev) continue;
-        const s = se[ev.eventIdFk]; if (!s || s.relay || s.combined) continue;
+        const s = se[ev.eventIdFk]; if (!s || s.combined) continue;
         const disc = roDisc(s.eventName); if (!disc) continue;
-        if (!ev.hasParticipants) { const cls = roClasses(ag[ev.ageGroupIdFk] || {}, ev.gender, ev.label); if (cls) program.push([cls, disc]); continue; }
+        if (!ev.hasParticipants || s.relay) { const cls = roClasses(ag[ev.ageGroupIdFk] || {}, ev.gender, ev.label); if (cls) program.push([cls, disc]); continue; }
         const res = await get(`${RO}/meeting/${m.meetingId}/results-v2/${ev.meetingEventIdPk}`, true);
         const gender = Object.fromEntries((res.athleteList || []).map(a => [a.athleteIdPk, a.gender]));
         // födelseår används bara här för att räkna fram svensk åldersklass och sparas aldrig
