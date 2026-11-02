@@ -22,6 +22,7 @@ const pl = (n, one, many) => n + ' ' + (n === 1 ? one : many);
 window.I18N = {
   /* ------------------------------------------------ SVENSKA */
   sv: {
+    disc_none: (d, c) => 'Ingen kommande tävling har ' + d + (c ? ' för ' + c : '') + ' just nu. Grenarna uppdateras varje natt, så titta gärna igen senare.',
     n_teams: n => n + ' lag',
     lbl_disc: 'Gren', opt_alld: 'Alla grenar', with_disc: (d, c) => 'med ' + d + (c ? ' för ' + c : ''), disc_hint: 'Tips: välj din klass överst, så visas bara tävlingar där grenen finns i din klass.',
     tip_label: 'Tips från oss', ad_label: 'Annons', tip_cta_yt: 'Se på YouTube', tip_cta: 'Läs mer',
@@ -84,6 +85,7 @@ window.I18N = {
   },
   /* ------------------------------------------------ ENGLISH */
   en: {
+    disc_none: (d, c) => 'No upcoming meet has ' + d + (c ? ' for ' + c : '') + ' right now. Events are updated every night, so check back later.',
     n_teams: n => n + ' ' + (n === 1 ? 'team' : 'teams'),
     lbl_disc: 'Event', opt_alld: 'All events', with_disc: (d, c) => 'with ' + d + (c ? ' for ' + c : ''), disc_hint: 'Tip: choose your class at the top to only see meets where the event is held in your class.',
     tip_label: 'Our tip', ad_label: 'Ad', tip_cta_yt: 'Watch on YouTube', tip_cta: 'Read more',
@@ -147,6 +149,7 @@ window.I18N = {
   },
   /* ------------------------------------------------ DEUTSCH */
   de: {
+    disc_none: (d, c) => 'Derzeit hat kein kommender Wettkampf ' + d + (c ? ' für ' + c : '') + '. Die Disziplinen werden jede Nacht aktualisiert – schau später wieder vorbei.',
     n_teams: n => n + ' ' + (n === 1 ? 'Staffel' : 'Staffeln'),
     lbl_disc: 'Disziplin', opt_alld: 'Alle Disziplinen', with_disc: (d, c) => 'mit ' + d + (c ? ' für ' + c : ''), disc_hint: 'Tipp: Wähle oben deine Klasse, dann siehst du nur Wettkämpfe, bei denen die Disziplin in deiner Klasse angeboten wird.',
     tip_label: 'Unser Tipp', ad_label: 'Anzeige', tip_cta_yt: 'Auf YouTube ansehen', tip_cta: 'Mehr erfahren',
@@ -210,6 +213,7 @@ window.I18N = {
   },
   /* ------------------------------------------------ FRANÇAIS */
   fr: {
+    disc_none: (d, c) => 'Aucune compétition à venir ne propose ' + d + (c ? ' pour ' + c : '') + ' pour le moment. Les épreuves sont mises à jour chaque nuit, reviens plus tard.',
     n_teams: n => n + ' ' + (n === 1 ? 'équipe' : 'équipes'),
     lbl_disc: 'Épreuve', opt_alld: 'Toutes les épreuves', with_disc: (d, c) => 'avec ' + d + (c ? ' pour ' + c : ''), disc_hint: 'Astuce : choisis ta catégorie en haut pour ne voir que les compétitions où l’épreuve existe dans ta catégorie.',
     tip_label: 'Notre conseil', ad_label: 'Publicité', tip_cta_yt: 'Voir sur YouTube', tip_cta: 'En savoir plus',
@@ -273,6 +277,7 @@ window.I18N = {
   },
   /* ------------------------------------------------ ESPAÑOL */
   es: {
+    disc_none: (d, c) => 'Ninguna competición próxima tiene ' + d + (c ? ' para ' + c : '') + ' por ahora. Las pruebas se actualizan cada noche, vuelve más tarde.',
     n_teams: n => n + ' ' + (n === 1 ? 'equipo' : 'equipos'),
     lbl_disc: 'Prueba', opt_alld: 'Todas las pruebas', with_disc: (d, c) => 'con ' + d + (c ? ' para ' + c : ''), disc_hint: 'Consejo: elige tu categoría arriba para ver solo competiciones donde la prueba existe en tu categoría.',
     tip_label: 'Nuestra recomendación', ad_label: 'Anuncio', tip_cta_yt: 'Ver en YouTube', tip_cta: 'Más información',
@@ -336,6 +341,7 @@ window.I18N = {
   },
   /* ------------------------------------------------ SUOMI */
   fi: {
+    disc_none: (d, c) => 'Tulevissa kilpailuissa ei tällä hetkellä ole lajia ' + d + (c ? ' sarjassa ' + c : '') + '. Lajit päivittyvät joka yö, joten katso myöhemmin uudelleen.',
     n_teams: n => n + ' ' + (n === 1 ? 'joukkue' : 'joukkuetta'),
     lbl_disc: 'Laji', opt_alld: 'Kaikki lajit', with_disc: (d, c) => '– ' + d + (c ? ', ' + c : ''), disc_hint: 'Vinkki: valitse sarjasi ylhäältä, niin näet vain kilpailut, joissa laji on sarjassasi.',
     tip_label: 'Vinkkimme', ad_label: 'Mainos', tip_cta_yt: 'Katso YouTubessa', tip_cta: 'Lue lisää',
@@ -398,6 +404,7 @@ window.I18N = {
   },
   /* ------------------------------------------------ DANSK */
   da: {
+    disc_none: (d, c) => 'Intet kommende stævne har ' + d + (c ? ' for ' + c : '') + ' lige nu. Disciplinerne opdateres hver nat, så kig forbi igen senere.',
     n_teams: n => n + ' hold',
     lbl_disc: 'Disciplin', opt_alld: 'Alle discipliner', with_disc: (d, c) => 'med ' + d + (c ? ' for ' + c : ''), disc_hint: 'Tip: vælg din klasse øverst, så ser du kun stævner, hvor disciplinen findes i din klasse.',
     tip_label: 'Vores tip', ad_label: 'Annonce', tip_cta_yt: 'Se på YouTube', tip_cta: 'Læs mere',

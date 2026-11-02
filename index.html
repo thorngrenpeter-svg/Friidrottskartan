@@ -372,7 +372,7 @@ let LANG=(()=>{ const s=store.get('fk-lang',null); return s&&I18N[s]? s : 'sv'; 
 const FB={lbl_disc:'Gren',opt_alld:'Alla grenar',with_disc:(d,c)=>'med '+d+(c?' för '+c:''),disc_hint:'Tips: välj din klass överst, så visas bara tävlingar där grenen finns i din klass.',
   tip_label:'Tips från oss',ad_label:'Annons',tip_cta_yt:'Se på YouTube',tip_cta:'Läs mer',ad_h:'Annonsera hos oss',ad_p:'Vill ditt företag eller din förening synas på Friidrottskartan? Lämna dina uppgifter så kontaktar vi dig med paket och priser.',
   af_org:'Företag/förening',af_phone:'Telefon',af_cc:'Landskod',af_btn:'Skicka förfrågan',af_ok:'Tack! Vi hör av oss inom ett par dagar.',af_invalid:'Fyll i namn, företag/förening och en giltig e-postadress.',af_mail:'Skicka förfrågan via e-post i stället',af_note:l=>'Vi använder uppgifterna bara för att svara på din förfrågan. Läs mer i '+l+'.',
-  n_teams:n=>n+' lag',nf_activate:'Formuläret håller på att aktiveras. Försök igen om en liten stund.',nf_mail:'Skicka anmälan via e-post i stället'};
+  n_teams:n=>n+' lag',disc_none:(d,c)=>'Ingen kommande tävling har '+d+(c?' för '+c:'')+' just nu. Grenarna uppdateras varje natt, så titta gärna igen senare.',nf_activate:'Formuläret håller på att aktiveras. Försök igen om en liten stund.',nf_mail:'Skicka anmälan via e-post i stället'};
 const t=(k,...a)=>{ let v=I18N[LANG][k]; if(v===undefined) v=I18N.sv[k]; if(v===undefined) v=FB[k]; return typeof v==='function'? v(...a) : (v===undefined?k:v); };
 const LOC={sv:'sv-SE',en:'en-GB',de:'de-DE',fr:'fr-FR',es:'es-ES',fi:'fi-FI',da:'da-DK'};
 let MON=[];
@@ -470,6 +470,7 @@ function normCls(s){ s=String(s).trim();
   if(/^(mix\s+)?veteraner\s+män$|^m\s?vet(eraner)?$|^mv$/i.test(s)) return 'MV';
   if(/^veteraner$/i.test(s)) return 'KV MV';
   const mx=s.match(/^(?:PF|FP)\s?(\d{1,2})$/i); if(mx) return 'F'+mx[1]+' P'+mx[1];
+  if(/^mix(ed)?$/i.test(s)) return 'K M';
   return s.replace(/^([KM])\s+(\d{2})$/,'$1$2'); }
 const isRelay=d=>/^\d+x\d+ m$|^Svensk stafett$/.test(d);
 const clsLabel=c=>t('cls')[c]||c;
@@ -599,8 +600,10 @@ function fillStamp(){ const src=[['https://easyrecord.se/','EasyRecord'],['https
 const hasDisc=(c,d)=>c.e.some(e=>e[1]===d&&(!profile.cls||clsMatch(e[0],profile.cls)));
 function fillDisc(){ const TODAY=new Date().toLocaleDateString('sv-SE');
   const up=D.comps.filter(c=>c.d2>=TODAY&&(S.country==='all'||c.co===S.country));
-  const all=[...new Set(up.flatMap(c=>c.e.map(e=>e[1])))].sort((a,b)=>{ const ia=DISCS.indexOf(a), ib=DISCS.indexOf(b); return (ia<0?999:ia)-(ib<0?999:ib)||a.localeCompare(b,'sv',{numeric:true}); });
-  const opts=all.map(d=>[d,up.filter(c=>hasDisc(c,d)).length]).filter(x=>x[1]>0||x[0]===S.disc);
+  // vanliga grenar och stafetter visas alltid, även utan tävlingar (0)
+  const BASE=[...DISCS,'4x60 m','4x100 m','4x200 m','4x400 m','Svensk stafett'];
+  const all=[...new Set([...BASE,...up.flatMap(c=>c.e.map(e=>e[1]))])].sort((a,b)=>{ const ia=BASE.indexOf(a), ib=BASE.indexOf(b); return (ia<0?999:ia)-(ib<0?999:ib)||a.localeCompare(b,'sv',{numeric:true}); });
+  const opts=all.map(d=>[d,up.filter(c=>hasDisc(c,d)).length]).filter(x=>x[1]>0||BASE.includes(x[0])||x[0]===S.disc);
   if(S.disc!=='all'&&!opts.some(x=>x[0]===S.disc)) opts.unshift([S.disc,0]);
   $('#disc').innerHTML='<option value="all">'+esc(t('opt_alld'))+'</option>'+opts.map(([d,n])=>'<option value="'+esc(d)+'">'+esc(discName(d))+' ('+n+')</option>').join('');
   $('#disc').value=S.disc; $('#disc').closest('.field').classList.toggle('active',S.disc!=='all'); }
@@ -740,6 +743,7 @@ function paneList(list){
   else h+='<p class="summary">'+t('upcoming',list.length)+(S.disc!=='all'?' '+esc(t('with_disc',discName(S.disc),profile.cls)):'')+' '+esc(S.center?(S.radius>0?t('within',S.radius,S.cityName):t('sorted_from',S.cityName)):(S.country==='all'?t('in_all'):S.country==='SWE'?t('in_swe'):t('in_c',coName(S.country))))+'</p>';
   if(S.disc!=='all' && !profile.cls) h+='<p class="note" style="margin:-4px 0 8px">'+esc(t('disc_hint'))+'</p>';
   if(S.center && S.radius===0) shown=[...shown].sort((a,b)=>a.dist-b.dist);
+  if(!shown.length && S.disc!=='all') { h+='<p class="empty">'+esc(t('disc_none',discName(S.disc),profile.cls))+'</p>'; return h; }
   h+= shown.length? '<div class="list">'+shown.map((c,i)=>itemHTML(c)+((i+1)%5===0?tipHTML(tipFor((i+1)/5-1)):'')).join('')+'</div>' : '<p class="empty">'+esc(t('empty_list'))+'</p>';
   return h;
 }
