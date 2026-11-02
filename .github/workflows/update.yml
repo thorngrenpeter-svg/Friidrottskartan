@@ -26,7 +26,7 @@ jobs:
       - name: Installera
         run: npm install --no-audit --no-fund
 
-      - name: Hämta tävlingar från EasyRecord och Webathletics
+      - name: Hämta tävlingar (EasyRecord, Webathletics, Track & Field, Roster)
         run: node scrape.mjs
 
       - name: Spara ny data
@@ -38,5 +38,10 @@ jobs:
             echo "Ingen ändring."
           else
             git commit -m "Uppdatera tävlingsdata $(date -u +%F)"
-            git push
+            # någon kan ha laddat upp filer medan hämtningen pågick: hämta dem först, försök upp till 3 gånger
+            for i in 1 2 3; do
+              git pull --rebase -X theirs origin main && git push && exit 0
+              echo "Försök $i misslyckades, väntar och provar igen..."; sleep 10
+            done
+            exit 1
           fi
