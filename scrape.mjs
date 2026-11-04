@@ -446,67 +446,6 @@ async function scrapeRoster(cityCoords) {
   return comps;
 }
 
-/* ---------- Svensk Friidrotts tävlingskalender (sanktionerade tävlingar) ---------- */
-// Listan är öppen (tavlingsansokan.friidrott.se/tävlingskalender). Detaljsidorna (/orderdetails) är spärrade
-// i sajtens robots.txt och hämtas därför inte – vi länkar bara till dem. Kontaktpersoner och e-post sparas aldrig.
-const SF = 'https://tavlingsansokan.friidrott.se';
-const SF_COLS = ['StartDate', 'Name', 'Type', 'City', 'OrganisationName', 'Level', 'OrderStatus', 'ShippingStatus', 'IPC', 'DM'];
-function sfBody(start, date) {
-  const q = new URLSearchParams(); q.set('draw', '1');
-  SF_COLS.forEach((c, i) => { const b = `columns[${i}]`; q.set(b + '[data]', c); q.set(b + '[name]', ''); q.set(b + '[searchable]', 'true'); q.set(b + '[orderable]', 'true'); q.set(b + '[search][value]', ''); q.set(b + '[search][regex]', 'false'); });
-  q.set('start', String(start)); q.set('length', '250'); q.set('search[value]', ''); q.set('search[regex]', 'false');
-  q.set('filter[Name]', ''); q.append('filter[Seasons][]', ''); q.set('filter[ApplicationTypeId]', '');
-  q.append('filter[StatusIds][]', '50'); q.append('filter[StatusIds][]', '60'); q.set('filter[LevelId]', '');
-  ['CompetitionTypes', 'ClassIds', 'EventIds'].forEach(k => q.append(`filter[${k}][]`, ''));
-  q.set('filter[StartDate]', date); q.set('filter[EndDate]', '');
-  q.append('filter[DistrictIdValues][]', ''); q.append('filter[OrganisationIdValues][]', ''); q.set('isCompetitonCalendar', 'true');
-  return q.toString();
-}
-const US2 = /^[A-Z]{2}$/;
-async function scrapeSfif(cityCoords) {
-  const resolve = makeCityResolver(cityCoords);
-  const rows = [];
-  for (let start = 0; start < 5000; start += 250) {
-    let j;
-    for (let i = 0; i < 3; i++) {
-      try {
-        const r = await fetch(SF + '/Frida/Orders_Read', { method: 'POST', headers: { 'User-Agent': UA, 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8', 'X-Requested-With': 'XMLHttpRequest' }, body: sfBody(start, today) });
-        if (!r.ok) throw new Error('HTTP ' + r.status); j = await r.json(); break;
-      } catch (e) { if (i === 2) throw e; await sleep(2000 * (i + 1)); }
-    }
-    rows.push(...(j.data || [])); await sleep(DELAY_MS);
-    if (!j.data || j.data.length < 250) break;
-  }
-  const keep = rows.filter(x => (x.EndDate || '').slice(0, 10) >= today && (/^(Arenatävlingar|Inomhus)$/.test(x.Type || '') || /barn/i.test(x.ApplicationType || '')));
-  console.log(`Svensk Friidrott: ${rows.length} kommande, ${keep.length} arena-, inomhus- och barntävlingar`);
-  const comps = [];
-  for (const x of keep) {
-    const raw = (x.City || '').trim();
-    if (!raw || /^(tbd|tbc|-)$/i.test(raw) || /inte utsedd|ej klar/i.test(raw)) continue;
-    let city = raw, co = 'SWE';
-    const m = raw.match(/^(.*?),\s*([A-Z]{2,3})$/);
-    if (m) { city = m[1].trim(); co = US2.test(m[2]) ? 'USA' : m[2]; }
-    let la, lo, ap = 1, cc3 = co;
-    const hit = co === 'SWE' ? resolve(city, x.Place) : null;
-    if (hit) { city = hit[0]; [la, lo] = hit[1]; }
-    else { const g = await geocode(city, co); if (!g) { console.warn(`  SFIF: hittar inte orten "${raw}" för ${x.Name}`); continue; } [la, lo, cc3] = g; }
-    const place = (x.Place || '').trim();
-    comps.push({ s: 'sf', co: cc3, id: String(x.OrderId), n: (x.Name || '').trim(), c: city, v: place === '-' ? '' : place, la, lo, ap,
-      d1: x.StartDate.slice(0, 10), d2: (x.EndDate || x.StartDate).slice(0, 10), h: (x.OrganisationName || '').trim(),
-      i: x.Type === 'Inomhus' || /inomhus/i.test(x.Season || '') ? 1 : 0, r: '', ro: '',
-      lv: /mästerskap/i.test(x.Level || '') ? 'M' : /barn/i.test(x.ApplicationType || '') ? 'B' : '', e: [] });
-  }
-  return comps;
-}
-// finns tävlingen redan från ett anmälningssystem? (samma dag och samma ort eller liknande namn)
-const words = s => new Set((s || '').toLowerCase().replace(/[^a-zåäö0-9 ]/g, ' ').split(/\s+/).filter(w => w.length >= 4 && !/^(spelen|tävling|friidrott|inomhus|utomhus|2026|2027|2028)$/.test(w)));
-function sameComp(a, b) {
-  if (!(a.d1 <= b.d2 && b.d1 <= a.d2)) return false;
-  if ((a.c || '').toLowerCase() === (b.c || '').toLowerCase()) return true;
-  const wa = words(a.n), wb = words(b.n); for (const w of wa) if (wb.has(w)) return true;
-  return false;
-}
-
 /* ---------- huvudprogram ---------- */
 async function main() {
   const findFile = name => [path.join(ROOT, name), path.join(ROOT, 'scripts', name)].find(f => fsSync.existsSync(f));
@@ -520,8 +459,8 @@ async function main() {
   let old = null; try { old = JSON.parse(await fs.readFile(OUT, 'utf8')); } catch {}
   for (const c of old?.cities || []) if (c[3] && c[3] !== 'SWE') { const v = [c[1], c[2], c[3]]; geoCache.set(c[0].toLowerCase() + '|' + c[3], v); if (!geoCache.has(c[0].toLowerCase() + '|')) geoCache.set(c[0].toLowerCase() + '|', v); }
 
-  const SOURCES = [['er', 'EasyRecord'], ['wa', 'Webathletics'], ['tf', 'Track & Field'], ['ro', 'Roster Athletics'], ['sf', 'Svensk Friidrott']];
-  const results = await Promise.allSettled([scrapeEasyRecord(), scrapeWebathletics(cityCoords, venues), scrapeTrackAndField(cityCoords), scrapeRoster(cityCoords), scrapeSfif(cityCoords)]);
+  const SOURCES = [['er', 'EasyRecord'], ['wa', 'Webathletics'], ['tf', 'Track & Field'], ['ro', 'Roster Athletics']];
+  const results = await Promise.allSettled([scrapeEasyRecord(), scrapeWebathletics(cityCoords, venues), scrapeTrackAndField(cityCoords), scrapeRoster(cityCoords)]);
   const parts = results.map((r, i) => {
     if (r.status === 'fulfilled' && r.value.length) return r.value;
     const [src, label] = SOURCES[i];
@@ -537,12 +476,7 @@ async function main() {
     const n = c.e.reduce((s, e) => s + e[3], 0);
     if (!seen.has(k) || n > seen.get(k).n) seen.set(k, { c, n });
   }
-  let comps = [...seen.values()].map(x => x.c);
-  // SFIF-kalendern: behåll bara tävlingar som inte redan finns från ett anmälningssystem (de har anmälda och grenar)
-  const others = comps.filter(c => c.s !== 'sf');
-  const before = comps.length;
-  comps = comps.filter(c => c.s !== 'sf' || !others.some(o => o.co === c.co && sameComp(o, c)));
-  console.log(`Svensk Friidrott: ${before - comps.length} fanns redan, ${comps.filter(c => c.s === 'sf').length} nya`);
+  const comps = [...seen.values()].map(x => x.c);
   if (results.slice(0, 2).every(r => r.status === 'rejected')) throw new Error('Både EasyRecord och Webathletics misslyckades – data.json lämnas orörd.');
   if (comps.length < 3) throw new Error(`Bara ${comps.length} tävlingar hittades – troligen har en sida ändrat utseende. data.json lämnas orörd.`);
 

@@ -22,7 +22,6 @@ const pl = (n, one, many) => n + ' ' + (n === 1 ? one : many);
 window.I18N = {
   /* ------------------------------------------------ SVENSKA */
   sv: {
-    tag_champ: 'Mästerskap', tag_kids: 'Barntävling', sf_note: 'Tävlingen är sanktionerad av Svensk Friidrott men anmälan och grenprogram är inte öppna i något anmälningssystem än. Se tävlingssidan för mer information.',
     tagline: 'Alla tävlingar på samma sida',
     disc_none: (d, c) => 'Ingen kommande tävling har ' + d + (c ? ' för ' + c : '') + ' just nu. Grenarna uppdateras varje natt, så titta gärna igen senare.',
     n_teams: n => n + ' lag',
@@ -41,7 +40,7 @@ window.I18N = {
     tab_list: 'Tävlingar', tab_pb: 'Mina PB', tab_fav: 'Mina favoriter',
     stamp: (links, date) => 'Kommande friidrottstävlingar från ' + links + ' · anmälningar hämtade ' + date, and: 'och', privacy: 'Integritet',
     about_h: 'Friidrottstävlingar i Sverige och utomlands',
-    about_p: 'Friidrottskartan samlar kommande friidrottstävlingar i Sverige och utomlands på ett ställe, med data från EasyRecord, Webathletics, Track & Field, Roster Athletics och Svensk Friidrotts tävlingskalender. Inomhus och utomhus, för ungdomar, juniorer, seniorer, veteraner och paraidrottare. Välj klass, land och ort och se tävlingarna på kartan med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa och ser hur du ligger till mot de anmälda i din klass. Spara favoriter och lägg in dem i din kalender. Datan uppdateras varje natt.',
+    about_p: 'Friidrottskartan samlar kommande friidrottstävlingar i Sverige och utomlands på ett ställe, med data från EasyRecord, Webathletics, Track & Field och Roster Athletics. Inomhus och utomhus, för ungdomar, juniorer, seniorer, veteraner och paraidrottare. Välj klass, land och ort och se tävlingarna på kartan med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa och ser hur du ligger till mot de anmälda i din klass. Spara favoriter och lägg in dem i din kalender. Datan uppdateras varje natt.',
     credits: osm => 'Kartdata: Natural Earth. Orter utanför Sverige: © ' + osm + '-bidragsgivare.', about_privacy: 'Om integritet',
     map_aria: x => 'Karta över ' + x + ' med tävlingsplatser', world: 'världen', mapnote0: 'Klicka en punkt för att se tävlingarna där',
     n_comps: n => pl(n, 'tävling', 'tävlingar'), n_places: n => pl(n, 'ort', 'orter'), on_places: (a, b) => a + ' på ' + b,
@@ -87,7 +86,6 @@ window.I18N = {
   },
   /* ------------------------------------------------ ENGLISH */
   en: {
-    tag_champ: 'Championship', tag_kids: 'Kids’ meet', sf_note: 'The meet is sanctioned by the Swedish Athletics Federation, but entries and the event programme are not open in any entry system yet. See the meet page for more information.',
     tagline: 'All meets in one place',
     disc_none: (d, c) => 'No upcoming meet has ' + d + (c ? ' for ' + c : '') + ' right now. Events are updated every night, so check back later.',
     n_teams: n => n + ' ' + (n === 1 ? 'team' : 'teams'),
@@ -106,7 +104,7 @@ window.I18N = {
     tab_list: 'Meets', tab_pb: 'My PBs', tab_fav: 'My favourites',
     stamp: (links, date) => 'Upcoming athletics meets from ' + links + ' · entries updated ' + date, and: 'and', privacy: 'Privacy',
     about_h: 'Athletics meets in Sweden and abroad',
-    about_p: 'Friidrottskartan collects upcoming athletics meets in Sweden and abroad in one place, with data from EasyRecord, Webathletics, Track & Field, Roster Athletics and the Swedish Athletics competition calendar. Indoor and outdoor, for youth, juniors, seniors, masters and para athletes. Choose your class, country and town and see the meets on the map with date, venue, organiser and entry deadline. Under My PBs you enter your personal bests and see how you compare with the athletes entered in your class. Save favourites and add them to your calendar. The data is updated every night.',
+    about_p: 'Friidrottskartan collects upcoming athletics meets in Sweden and abroad in one place, with data from EasyRecord, Webathletics, Track & Field and Roster Athletics. Indoor and outdoor, for youth, juniors, seniors, masters and para athletes. Choose your class, country and town and see the meets on the map with date, venue, organiser and entry deadline. Under My PBs you enter your personal bests and see how you compare with the athletes entered in your class. Save favourites and add them to your calendar. The data is updated every night.',
     credits: osm => 'Map data: Natural Earth. Towns outside Sweden: © ' + osm + ' contributors.', about_privacy: 'About privacy',
     map_aria: x => 'Map of ' + x + ' with meet locations', world: 'the world', mapnote0: 'Click a point to see the meets there',
     n_comps: n => pl(n, 'meet', 'meets'), n_places: n => pl(n, 'place', 'places'), on_places: (a, b) => a + ' in ' + b,
@@ -153,7 +151,6 @@ window.I18N = {
   },
   /* ------------------------------------------------ DEUTSCH */
   de: {
-    tag_champ: 'Meisterschaft', tag_kids: 'Kinderwettkampf', sf_note: 'Der Wettkampf ist vom schwedischen Leichtathletikverband genehmigt, aber Meldung und Programm sind noch in keinem Meldesystem geöffnet. Mehr Infos auf der Wettkampfseite.',
     tagline: 'Alle Wettkämpfe an einem Ort',
     disc_none: (d, c) => 'Derzeit hat kein kommender Wettkampf ' + d + (c ? ' für ' + c : '') + '. Die Disziplinen werden jede Nacht aktualisiert – schau später wieder vorbei.',
     n_teams: n => n + ' ' + (n === 1 ? 'Staffel' : 'Staffeln'),
@@ -172,7 +169,7 @@ window.I18N = {
     tab_list: 'Wettkämpfe', tab_pb: 'Meine PBs', tab_fav: 'Meine Favoriten',
     stamp: (links, date) => 'Kommende Leichtathletik-Wettkämpfe von ' + links + ' · Meldungen aktualisiert am ' + date, and: 'und', privacy: 'Datenschutz',
     about_h: 'Leichtathletik-Wettkämpfe in Schweden und im Ausland',
-    about_p: 'Friidrottskartan sammelt kommende Leichtathletik-Wettkämpfe in Schweden und im Ausland an einem Ort, mit Daten von EasyRecord, Webathletics, Track & Field, Roster Athletics und dem Wettkampfkalender des schwedischen Verbands. Halle und Freiluft, für Jugendliche, Junioren, Aktive, Senioren und Para-Athleten. Wähle Klasse, Land und Ort und sieh die Wettkämpfe auf der Karte mit Datum, Wettkampfstätte, Veranstalter und Meldeschluss. Unter Meine PBs trägst du deine Bestleistungen ein und siehst, wie du im Vergleich zu den Gemeldeten deiner Klasse liegst. Speichere Favoriten und trage sie in deinen Kalender ein. Die Daten werden jede Nacht aktualisiert.',
+    about_p: 'Friidrottskartan sammelt kommende Leichtathletik-Wettkämpfe in Schweden und im Ausland an einem Ort, mit Daten von EasyRecord, Webathletics, Track & Field und Roster Athletics. Halle und Freiluft, für Jugendliche, Junioren, Aktive, Senioren und Para-Athleten. Wähle Klasse, Land und Ort und sieh die Wettkämpfe auf der Karte mit Datum, Wettkampfstätte, Veranstalter und Meldeschluss. Unter Meine PBs trägst du deine Bestleistungen ein und siehst, wie du im Vergleich zu den Gemeldeten deiner Klasse liegst. Speichere Favoriten und trage sie in deinen Kalender ein. Die Daten werden jede Nacht aktualisiert.',
     credits: osm => 'Kartendaten: Natural Earth. Orte außerhalb Schwedens: © ' + osm + '-Mitwirkende.', about_privacy: 'Zum Datenschutz',
     map_aria: x => 'Karte von ' + x + ' mit Wettkampforten', world: 'der Welt', mapnote0: 'Klicke auf einen Punkt, um die Wettkämpfe dort zu sehen',
     n_comps: n => pl(n, 'Wettkampf', 'Wettkämpfe'), n_places: n => pl(n, 'Ort', 'Orten'), on_places: (a, b) => a + ' an ' + b,
@@ -219,7 +216,6 @@ window.I18N = {
   },
   /* ------------------------------------------------ FRANÇAIS */
   fr: {
-    tag_champ: 'Championnat', tag_kids: 'Compétition enfants', sf_note: 'La compétition est homologuée par la Fédération suédoise d’athlétisme, mais les inscriptions et le programme ne sont encore ouverts dans aucun système. Voir la page de la compétition.',
     tagline: 'Toutes les compétitions au même endroit',
     disc_none: (d, c) => 'Aucune compétition à venir ne propose ' + d + (c ? ' pour ' + c : '') + ' pour le moment. Les épreuves sont mises à jour chaque nuit, reviens plus tard.',
     n_teams: n => n + ' ' + (n === 1 ? 'équipe' : 'équipes'),
@@ -238,7 +234,7 @@ window.I18N = {
     tab_list: 'Compétitions', tab_pb: 'Mes records', tab_fav: 'Mes favoris',
     stamp: (links, date) => 'Compétitions d’athlétisme à venir sur ' + links + ' · inscriptions mises à jour le ' + date, and: 'et', privacy: 'Confidentialité',
     about_h: 'Compétitions d’athlétisme en Suède et à l’étranger',
-    about_p: 'Friidrottskartan rassemble les compétitions d’athlétisme à venir en Suède et à l’étranger en un seul endroit, avec des données d’EasyRecord, Webathletics, Track & Field, Roster Athletics et le calendrier de la Fédération suédoise. En salle et en plein air, pour les jeunes, les juniors, les seniors, les masters et les para-athlètes. Choisis ta catégorie, ton pays et ta ville et vois les compétitions sur la carte avec la date, le lieu, l’organisateur et la date limite d’inscription. Dans Mes records, saisis tes meilleures performances et compare-toi aux inscrits de ta catégorie. Enregistre des favoris et ajoute-les à ton agenda. Les données sont mises à jour chaque nuit.',
+    about_p: 'Friidrottskartan rassemble les compétitions d’athlétisme à venir en Suède et à l’étranger en un seul endroit, avec des données d’EasyRecord, Webathletics, Track & Field et Roster Athletics. En salle et en plein air, pour les jeunes, les juniors, les seniors, les masters et les para-athlètes. Choisis ta catégorie, ton pays et ta ville et vois les compétitions sur la carte avec la date, le lieu, l’organisateur et la date limite d’inscription. Dans Mes records, saisis tes meilleures performances et compare-toi aux inscrits de ta catégorie. Enregistre des favoris et ajoute-les à ton agenda. Les données sont mises à jour chaque nuit.',
     credits: osm => 'Données cartographiques : Natural Earth. Villes hors de Suède : © contributeurs ' + osm + '.', about_privacy: 'Confidentialité',
     map_aria: x => 'Carte de ' + x + ' avec les lieux de compétition', world: 'monde', mapnote0: 'Clique sur un point pour voir les compétitions',
     n_comps: n => pl(n, 'compétition', 'compétitions'), n_places: n => pl(n, 'lieu', 'lieux'), on_places: (a, b) => a + ' dans ' + b,
@@ -285,7 +281,6 @@ window.I18N = {
   },
   /* ------------------------------------------------ ESPAÑOL */
   es: {
-    tag_champ: 'Campeonato', tag_kids: 'Competición infantil', sf_note: 'La competición está autorizada por la Federación Sueca de Atletismo, pero las inscripciones y el programa aún no están abiertos en ningún sistema. Consulta la página de la competición.',
     tagline: 'Todas las competiciones en un solo lugar',
     disc_none: (d, c) => 'Ninguna competición próxima tiene ' + d + (c ? ' para ' + c : '') + ' por ahora. Las pruebas se actualizan cada noche, vuelve más tarde.',
     n_teams: n => n + ' ' + (n === 1 ? 'equipo' : 'equipos'),
@@ -304,7 +299,7 @@ window.I18N = {
     tab_list: 'Competiciones', tab_pb: 'Mis marcas', tab_fav: 'Mis favoritas',
     stamp: (links, date) => 'Próximas competiciones de atletismo de ' + links + ' · inscripciones actualizadas el ' + date, and: 'y', privacy: 'Privacidad',
     about_h: 'Competiciones de atletismo en Suecia y en el extranjero',
-    about_p: 'Friidrottskartan reúne en un solo lugar las próximas competiciones de atletismo en Suecia y en el extranjero, con datos de EasyRecord, Webathletics, Track & Field, Roster Athletics y el calendario de la Federación Sueca. En pista cubierta y al aire libre, para jóvenes, júniores, sénior, máster y para-atletas. Elige tu categoría, país y ciudad y mira las competiciones en el mapa con fecha, lugar, organizador y fecha límite de inscripción. En Mis marcas introduces tus mejores marcas y ves cómo te comparas con los inscritos de tu categoría. Guarda favoritas y añádelas a tu calendario. Los datos se actualizan cada noche.',
+    about_p: 'Friidrottskartan reúne en un solo lugar las próximas competiciones de atletismo en Suecia y en el extranjero, con datos de EasyRecord, Webathletics, Track & Field y Roster Athletics. En pista cubierta y al aire libre, para jóvenes, júniores, sénior, máster y para-atletas. Elige tu categoría, país y ciudad y mira las competiciones en el mapa con fecha, lugar, organizador y fecha límite de inscripción. En Mis marcas introduces tus mejores marcas y ves cómo te comparas con los inscritos de tu categoría. Guarda favoritas y añádelas a tu calendario. Los datos se actualizan cada noche.',
     credits: osm => 'Datos del mapa: Natural Earth. Ciudades fuera de Suecia: © colaboradores de ' + osm + '.', about_privacy: 'Privacidad',
     map_aria: x => 'Mapa de ' + x + ' con lugares de competición', world: 'el mundo', mapnote0: 'Haz clic en un punto para ver las competiciones',
     n_comps: n => pl(n, 'competición', 'competiciones'), n_places: n => pl(n, 'lugar', 'lugares'), on_places: (a, b) => a + ' en ' + b,
@@ -351,7 +346,6 @@ window.I18N = {
   },
   /* ------------------------------------------------ SUOMI */
   fi: {
-    tag_champ: 'Mestaruuskilpailu', tag_kids: 'Lasten kilpailu', sf_note: 'Kilpailu on Ruotsin yleisurheiluliiton hyväksymä, mutta ilmoittautuminen ja lajiohjelma eivät ole vielä auki missään järjestelmässä. Katso lisätiedot kilpailusivulta.',
     tagline: 'Kaikki kilpailut samassa paikassa',
     disc_none: (d, c) => 'Tulevissa kilpailuissa ei tällä hetkellä ole lajia ' + d + (c ? ' sarjassa ' + c : '') + '. Lajit päivittyvät joka yö, joten katso myöhemmin uudelleen.',
     n_teams: n => n + ' ' + (n === 1 ? 'joukkue' : 'joukkuetta'),
@@ -369,7 +363,7 @@ window.I18N = {
     tab_list: 'Kilpailut', tab_pb: 'Omat ennätykset', tab_fav: 'Suosikit',
     stamp: (links, date) => 'Tulevat yleisurheilukilpailut: ' + links + ' · ilmoittautumiset päivitetty ' + date, and: 'ja', privacy: 'Tietosuoja',
     about_h: 'Yleisurheilukilpailut Ruotsissa ja ulkomailla',
-    about_p: 'Friidrottskartan kokoaa tulevat yleisurheilukilpailut Ruotsissa ja ulkomailla yhteen paikkaan. Tiedot tulevat EasyRecordista, Webathleticsista, Track & Fieldistä, Roster Athleticsista ja Ruotsin liiton kilpailukalenterista. Mukana on sisä- ja ulkokilpailuja nuorille, junioreille, aikuisille, veteraaneille ja parayleisurheilijoille. Valitse sarja, maa ja paikkakunta, niin näet kilpailut kartalla päivämäärän, kilpailupaikan, järjestäjän ja ilmoittautumisen takarajan kanssa. Omat ennätykset -kohdassa syötät ennätyksesi ja näet, miten sijoitut sarjasi ilmoittautuneisiin. Tallenna suosikit ja lisää ne kalenteriisi. Tiedot päivittyvät joka yö.',
+    about_p: 'Friidrottskartan kokoaa tulevat yleisurheilukilpailut Ruotsissa ja ulkomailla yhteen paikkaan. Tiedot tulevat EasyRecordista, Webathleticsista, Track & Fieldistä ja Roster Athleticsista. Mukana on sisä- ja ulkokilpailuja nuorille, junioreille, aikuisille, veteraaneille ja parayleisurheilijoille. Valitse sarja, maa ja paikkakunta, niin näet kilpailut kartalla päivämäärän, kilpailupaikan, järjestäjän ja ilmoittautumisen takarajan kanssa. Omat ennätykset -kohdassa syötät ennätyksesi ja näet, miten sijoitut sarjasi ilmoittautuneisiin. Tallenna suosikit ja lisää ne kalenteriisi. Tiedot päivittyvät joka yö.',
     credits: osm => 'Karttatiedot: Natural Earth. Ruotsin ulkopuoliset paikkakunnat: © ' + osm + ' -tekijät.', about_privacy: 'Tietosuojasta',
     map_aria: x => 'Kartta: ' + x + ' ja kilpailupaikat', world: 'maailma', mapnote0: 'Napsauta pistettä nähdäksesi paikan kilpailut',
     n_comps: n => n + ' ' + (n === 1 ? 'kilpailu' : 'kilpailua'), n_places: n => n + ' ' + (n === 1 ? 'paikkakunta' : 'paikkakuntaa'), on_places: (a, b) => a + ', ' + b,
@@ -416,7 +410,6 @@ window.I18N = {
   },
   /* ------------------------------------------------ DANSK */
   da: {
-    tag_champ: 'Mesterskab', tag_kids: 'Børnestævne', sf_note: 'Stævnet er godkendt af det svenske atletikforbund, men tilmelding og program er endnu ikke åbne i noget tilmeldingssystem. Se stævnesiden for mere information.',
     tagline: 'Alle stævner samlet ét sted',
     disc_none: (d, c) => 'Intet kommende stævne har ' + d + (c ? ' for ' + c : '') + ' lige nu. Disciplinerne opdateres hver nat, så kig forbi igen senere.',
     n_teams: n => n + ' hold',
@@ -434,7 +427,7 @@ window.I18N = {
     tab_list: 'Stævner', tab_pb: 'Mine PR', tab_fav: 'Mine favoritter',
     stamp: (links, date) => 'Kommende atletikstævner fra ' + links + ' · tilmeldinger opdateret ' + date, and: 'og', privacy: 'Privatliv',
     about_h: 'Atletikstævner i Sverige og udlandet',
-    about_p: 'Friidrottskartan samler kommende atletikstævner i Sverige og udlandet ét sted, med data fra EasyRecord, Webathletics, Track & Field, Roster Athletics og det svenske forbunds stævnekalender. Indendørs og udendørs, for børn og unge, juniorer, seniorer, veteraner og para-atleter. Vælg klasse, land og by, og se stævnerne på kortet med dato, sted, arrangør og tilmeldingsfrist. Under Mine PR indtaster du dine personlige rekorder og ser, hvordan du ligger i forhold til de tilmeldte i din klasse. Gem favoritter og læg dem i din kalender. Dataene opdateres hver nat.',
+    about_p: 'Friidrottskartan samler kommende atletikstævner i Sverige og udlandet ét sted, med data fra EasyRecord, Webathletics, Track & Field og Roster Athletics. Indendørs og udendørs, for børn og unge, juniorer, seniorer, veteraner og para-atleter. Vælg klasse, land og by, og se stævnerne på kortet med dato, sted, arrangør og tilmeldingsfrist. Under Mine PR indtaster du dine personlige rekorder og ser, hvordan du ligger i forhold til de tilmeldte i din klasse. Gem favoritter og læg dem i din kalender. Dataene opdateres hver nat.',
     credits: osm => 'Kortdata: Natural Earth. Byer uden for Sverige: © ' + osm + '-bidragydere.', about_privacy: 'Om privatliv',
     map_aria: x => 'Kort over ' + x + ' med stævnesteder', world: 'verden', mapnote0: 'Klik på et punkt for at se stævnerne der',
     n_comps: n => n + ' ' + (n === 1 ? 'stævne' : 'stævner'), n_places: n => n + ' ' + (n === 1 ? 'by' : 'byer'), on_places: (a, b) => a + ' i ' + b,
