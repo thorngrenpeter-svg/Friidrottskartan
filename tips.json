@@ -40,5 +40,24 @@
    "fi": "YouTube-kanava juoksijoille, jotka rakastavat polkujuoksua, kaupunkijuoksua ja ulkoilmaelämää.",
    "da": "En YouTube-kanal for løbere, der elsker trailløb, løb i byen og livet udendørs."
   }
+ },
+ {
+  "id": "springlfa",
+  "typ": "tips",
+  "bild": "springlfa.webp",
+  "bredd": 800,
+  "hojd": 447,
+  "lank": "https://springlfa.se/",
+  "start": "2026-11-04",
+  "titel": "Spring · Löpning för alla",
+  "text": {
+   "sv": "Sveriges löparmagasin med nyheter, tävlingsrapporter, träningsprogram och lopp att anmäla sig till.",
+   "en": "Swedish running magazine with news, race reports, training plans and races to sign up for.",
+   "de": "Schwedisches Laufmagazin mit News, Wettkampfberichten, Trainingsplänen und Läufen zum Anmelden.",
+   "fr": "Magazine suédois de course à pied : actualités, comptes rendus de courses, plans d'entraînement et courses où s'inscrire.",
+   "es": "Revista sueca de running con noticias, crónicas de carreras, planes de entrenamiento y carreras para inscribirse.",
+   "fi": "Ruotsalainen juoksulehti: uutisia, kilpailuraportteja, harjoitusohjelmia ja juoksutapahtumia.",
+   "da": "Svensk løbemagasin med nyheder, løbsreportager, træningsprogrammer og løb at tilmelde sig."
+  }
  }
 ]
