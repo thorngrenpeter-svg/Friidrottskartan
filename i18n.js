@@ -22,6 +22,7 @@ const pl = (n, one, many) => n + ' ' + (n === 1 ? one : many);
 window.I18N = {
   /* ------------------------------------------------ SVENSKA */
   sv: {
+    ad_invite: 'Inbjudan', ad_show: 'Visa tävlingen',
     tagline: 'Alla tävlingar på samma sida',
     disc_none: (d, c) => 'Ingen kommande tävling har ' + d + (c ? ' för ' + c : '') + ' just nu. Grenarna uppdateras varje natt, så titta gärna igen senare.',
     n_teams: n => n + ' lag',
@@ -86,6 +87,7 @@ window.I18N = {
   },
   /* ------------------------------------------------ ENGLISH */
   en: {
+    ad_invite: 'Invitation', ad_show: 'Show the meet',
     tagline: 'All meets in one place',
     disc_none: (d, c) => 'No upcoming meet has ' + d + (c ? ' for ' + c : '') + ' right now. Events are updated every night, so check back later.',
     n_teams: n => n + ' ' + (n === 1 ? 'team' : 'teams'),
@@ -151,6 +153,7 @@ window.I18N = {
   },
   /* ------------------------------------------------ DEUTSCH */
   de: {
+    ad_invite: 'Ausschreibung', ad_show: 'Wettkampf anzeigen',
     tagline: 'Alle Wettkämpfe an einem Ort',
     disc_none: (d, c) => 'Derzeit hat kein kommender Wettkampf ' + d + (c ? ' für ' + c : '') + '. Die Disziplinen werden jede Nacht aktualisiert – schau später wieder vorbei.',
     n_teams: n => n + ' ' + (n === 1 ? 'Staffel' : 'Staffeln'),
@@ -216,6 +219,7 @@ window.I18N = {
   },
   /* ------------------------------------------------ FRANÇAIS */
   fr: {
+    ad_invite: 'Invitation', ad_show: 'Voir la compétition',
     tagline: 'Toutes les compétitions au même endroit',
     disc_none: (d, c) => 'Aucune compétition à venir ne propose ' + d + (c ? ' pour ' + c : '') + ' pour le moment. Les épreuves sont mises à jour chaque nuit, reviens plus tard.',
     n_teams: n => n + ' ' + (n === 1 ? 'équipe' : 'équipes'),
@@ -281,6 +285,7 @@ window.I18N = {
   },
   /* ------------------------------------------------ ESPAÑOL */
   es: {
+    ad_invite: 'Invitación', ad_show: 'Ver la competición',
     tagline: 'Todas las competiciones en un solo lugar',
     disc_none: (d, c) => 'Ninguna competición próxima tiene ' + d + (c ? ' para ' + c : '') + ' por ahora. Las pruebas se actualizan cada noche, vuelve más tarde.',
     n_teams: n => n + ' ' + (n === 1 ? 'equipo' : 'equipos'),
@@ -346,6 +351,7 @@ window.I18N = {
   },
   /* ------------------------------------------------ SUOMI */
   fi: {
+    ad_invite: 'Kutsu', ad_show: 'Näytä kilpailu',
     tagline: 'Kaikki kilpailut samassa paikassa',
     disc_none: (d, c) => 'Tulevissa kilpailuissa ei tällä hetkellä ole lajia ' + d + (c ? ' sarjassa ' + c : '') + '. Lajit päivittyvät joka yö, joten katso myöhemmin uudelleen.',
     n_teams: n => n + ' ' + (n === 1 ? 'joukkue' : 'joukkuetta'),
@@ -410,6 +416,7 @@ window.I18N = {
   },
   /* ------------------------------------------------ DANSK */
   da: {
+    ad_invite: 'Invitation', ad_show: 'Vis stævnet',
     tagline: 'Alle stævner samlet ét sted',
     disc_none: (d, c) => 'Intet kommende stævne har ' + d + (c ? ' for ' + c : '') + ' lige nu. Disciplinerne opdateres hver nat, så kig forbi igen senere.',
     n_teams: n => n + ' hold',

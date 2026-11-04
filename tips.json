@@ -1,22 +1,44 @@
 [
-  {
-    "id": "terranomads",
-    "typ": "tips",
-    "bild": "terranomads.webp",
-    "bredd": 800,
-    "hojd": 447,
-    "lank": "https://www.youtube.com/@Terra-Nomads",
-    "start": "2026-11-01",
-    "slut": "2026-11-15",
-    "titel": "TerraNomads · YouTube",
-    "text": {
-      "sv": "En YouTube-kanal för dig som älskar trailrunning, löpning i stan och livet utomhus.",
-      "en": "A YouTube channel for runners who love trail running, urban running and life outdoors.",
-      "de": "Ein YouTube-Kanal für alle, die Trailrunning, Laufen in der Stadt und das Leben draußen lieben.",
-      "fr": "Une chaîne YouTube pour les coureurs qui aiment le trail, la course en ville et la vie en plein air.",
-      "es": "Un canal de YouTube para corredores que aman el trail running, correr por la ciudad y la vida al aire libre.",
-      "fi": "YouTube-kanava juoksijoille, jotka rakastavat polkujuoksua, kaupunkijuoksua ja ulkoilmaelämää.",
-      "da": "En YouTube-kanal for løbere, der elsker trailløb, løb i byen og livet udendørs."
-    }
+ {
+  "id": "eskilstunaspelen-2026",
+  "typ": "annons",
+  "format": "tavling",
+  "fast": true,
+  "tavling": "wa:920",
+  "start": "2026-11-04",
+  "slut": "2026-11-22",
+  "lank": "https://webathletics.se/entrylist/920",
+  "inbjudan": "https://www.laget.se/eskilstunafriidrott/news/8168178/ESKILSTUNA-SPELEN-2026",
+  "titel": "Eskilstunaspelen i friidrott 2026",
+  "datum": "2026-11-22",
+  "plats": "MunktellArenan, Eskilstuna · inomhus",
+  "arrangor": "Eskilstuna Friidrott",
+  "text": "Friidrottstävlingen för nybörjare såväl som för vana tävlingsdeltagare.",
+  "klasser": "Pojkar och flickor 7–15 år · 2027 års åldersklasser",
+  "grenar": "60 m, längd, kula och gång 500 m · 13 och 15 år även 200 m och höjd",
+  "anmalan": "Anmäl senast 16 november · 120 kr/gren",
+  "cta": "Anmäl dig på Webathletics",
+  "farg": "#1A7FA8",
+  "kort": "P/F 7–15 år · Anmäl senast 16 nov · 120 kr/gren"
+ },
+ {
+  "id": "terranomads",
+  "typ": "tips",
+  "bild": "terranomads.webp",
+  "bredd": 800,
+  "hojd": 447,
+  "lank": "https://www.youtube.com/@Terra-Nomads",
+  "start": "2026-11-01",
+  "slut": "2026-11-15",
+  "titel": "TerraNomads · YouTube",
+  "text": {
+   "sv": "En YouTube-kanal för dig som älskar trailrunning, löpning i stan och livet utomhus.",
+   "en": "A YouTube channel for runners who love trail running, urban running and life outdoors.",
+   "de": "Ein YouTube-Kanal für alle, die Trailrunning, Laufen in der Stadt und das Leben draußen lieben.",
+   "fr": "Une chaîne YouTube pour les coureurs qui aiment le trail, la course en ville et la vie en plein air.",
+   "es": "Un canal de YouTube para corredores que aman el trail running, correr por la ciudad y la vida al aire libre.",
+   "fi": "YouTube-kanava juoksijoille, jotka rakastavat polkujuoksua, kaupunkijuoksua ja ulkoilmaelämää.",
+   "da": "En YouTube-kanal for løbere, der elsker trailløb, løb i byen og livet udendørs."
   }
+ }
 ]

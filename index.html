@@ -258,6 +258,20 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .evrow{display:flex;justify-content:space-between;gap:8px;padding:7px 2px}
 .evrow .n{color:var(--muted);font-size:12.5px;white-space:nowrap}
 #disc{max-width:190px}
+.adcard{border:2px solid var(--ad);border-radius:10px;margin:0 0 10px;overflow:hidden;background:var(--panel)}
+.adtop{display:flex;justify-content:space-between;align-items:center;gap:8px;background:var(--ad);color:#fff;padding:2px 10px;font-family:var(--f-display);font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase}
+.adlbl{background:rgba(255,255,255,.22);border-radius:3px;padding:0 6px}
+.adorg{opacity:.95;text-transform:none;letter-spacing:.02em;font-family:var(--f-body);font-size:11px}
+.adbody{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;padding:8px 10px}
+.addate{border-color:var(--ad);color:var(--ad);align-self:start;height:auto;padding:3px 0}
+.addate b{font-size:19px}
+.adbody h3{margin:0;font-family:var(--f-display);font-size:17px;line-height:1.05;text-transform:uppercase;letter-spacing:.01em;color:var(--ad)}
+.admeta{font-size:12.5px;margin-top:1px}
+.adkort{font-size:12.5px;margin-top:2px;color:var(--ink)}
+.adbtns{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin-top:6px}
+.adbtn{background:var(--ad);border-color:var(--ad);color:#fff!important;text-decoration:none;padding:4px 10px;font-size:13px;min-height:0;line-height:1.3}
+.adsec{background:none;border:0;padding:0;color:var(--ad);font-weight:600;font-size:12.5px;cursor:pointer;text-decoration:none}
+@media (prefers-color-scheme: dark){.adbody h3,.adsec,.addate{filter:brightness(1.5)}}
 .tipcard{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr);gap:12px;align-items:center;margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);text-decoration:none}
 .tipcard:hover{border-color:var(--track)}
 .tipcard.noimg{grid-template-columns:minmax(0,1fr)}
@@ -375,7 +389,7 @@ let LANG=(()=>{ const s=store.get('fk-lang',null); return s&&I18N[s]? s : 'sv'; 
 const FB={lbl_disc:'Gren',opt_alld:'Alla grenar',with_disc:(d,c)=>'med '+d+(c?' för '+c:''),disc_hint:'Tips: välj din klass överst, så visas bara tävlingar där grenen finns i din klass.',
   tip_label:'Tips från oss',ad_label:'Annons',tip_cta_yt:'Se på YouTube',tip_cta:'Läs mer',ad_h:'Annonsera hos oss',ad_p:'Vill ditt företag eller din förening synas på Friidrottskartan? Lämna dina uppgifter så kontaktar vi dig med paket och priser.',
   af_org:'Företag/förening',af_phone:'Telefon',af_cc:'Landskod',af_btn:'Skicka förfrågan',af_ok:'Tack! Vi hör av oss inom ett par dagar.',af_invalid:'Fyll i namn, företag/förening och en giltig e-postadress.',af_mail:'Skicka förfrågan via e-post i stället',af_note:l=>'Vi använder uppgifterna bara för att svara på din förfrågan. Läs mer i '+l+'.',
-  n_teams:n=>n+' lag',tagline:'Alla tävlingar på samma sida',disc_none:(d,c)=>'Ingen kommande tävling har '+d+(c?' för '+c:'')+' just nu. Grenarna uppdateras varje natt, så titta gärna igen senare.',nf_activate:'Formuläret håller på att aktiveras. Försök igen om en liten stund.',nf_mail:'Skicka anmälan via e-post i stället'};
+  n_teams:n=>n+' lag',ad_invite:'Inbjudan',ad_show:'Visa tävlingen',tagline:'Alla tävlingar på samma sida',disc_none:(d,c)=>'Ingen kommande tävling har '+d+(c?' för '+c:'')+' just nu. Grenarna uppdateras varje natt, så titta gärna igen senare.',nf_activate:'Formuläret håller på att aktiveras. Försök igen om en liten stund.',nf_mail:'Skicka anmälan via e-post i stället'};
 const t=(k,...a)=>{ let v=I18N[LANG][k]; if(v===undefined) v=I18N.sv[k]; if(v===undefined) v=FB[k]; return typeof v==='function'? v(...a) : (v===undefined?k:v); };
 const LOC={sv:'sv-SE',en:'en-GB',de:'de-DE',fr:'fr-FR',es:'es-ES',fi:'fi-FI',da:'da-DK'};
 let MON=[];
@@ -490,7 +504,22 @@ fetch('tips.json',{cache:'no-cache'}).then(r=>r.ok?r.json():[]).then(a=>{ const 
 const tt=(k,d)=>{ const v=t(k); return v===k?d:v; }; // reservtext om i18n.js är en äldre version
 const tipSeen=new Set();
 const tipObs=('IntersectionObserver' in window)? new IntersectionObserver(es=>es.forEach(e=>{ if(!e.isIntersecting) return; const id=e.target.dataset.tip; tipObs.unobserve(e.target); if(tipSeen.has(id)) return; tipSeen.add(id); track('Tips visning',{namn:id},true); }),{threshold:0.5}) : null;
-const tipFor=n=> TIPS.length? TIPS[n%TIPS.length] : null;
+const ROT=()=>TIPS.filter(x=>!x.fast); // vanliga tips/annonser som roterar i listan
+const tipFor=n=>{ const r=ROT(); return r.length? r[n%r.length] : null; };
+// fast annons för en tävling: ligger alltid överst i listan oavsett filter
+function pinnedHTML(){ const x=TIPS.find(a=>a.fast&&a.format==='tavling'); if(!x) return '';
+  const c=D.comps.find(k=>k.fk===x.tavling);
+  const [yy,mm,dd]=(x.datum||c?.d1||'').split('-');
+  const col=/^#[0-9a-f]{6}$/i.test(x.farg||'')?x.farg:'var(--track)';
+  return '<div class="adcard" style="--ad:'+col+'" data-ad="'+esc(x.id)+'">'
+   +'<div class="adtop"><span class="adlbl">'+esc(t('ad_label'))+'</span>'+(x.arrangor?'<span class="adorg">'+esc(x.arrangor)+'</span>':'')+'</div>'
+   +'<div class="adbody"><div class="date addate"><b>'+(+dd||'')+'</b><span>'+(mm?MON[mm-1]:'')+'</span></div><div>'
+   +'<h3>'+esc(x.titel)+'</h3><div class="meta admeta">'+esc(x.plats||'')+'</div>'
+   +(x.kort?'<div class="adkort">'+esc(x.kort)+'</div>':'')
+   +'<div class="adbtns"><a class="btn adbtn" href="'+esc(x.lank)+'" target="_blank" rel="sponsored noopener" data-adlink="anmalan">'+esc(x.cta||'Läs mer')+' ↗</a>'
+   +(x.inbjudan?'<a class="adsec" href="'+esc(x.inbjudan)+'" target="_blank" rel="sponsored noopener" data-adlink="inbjudan">'+esc(tt('ad_invite','Inbjudan'))+' ↗</a>':'')
+   +(c?'<button type="button" class="adsec" data-adopen="'+c.idx+'">'+esc(tt('ad_show','Visa tävlingen'))+'</button>':'')
+   +'</div></div></div></div>'; }
 function tipHTML(x){ if(!x) return '';
   const txt=(x.text&&(x.text[LANG]||x.text.sv))||'';
   return '<a class="tipcard" href="'+esc(x.lank)+'" target="_blank" rel="noopener'+(x.typ==='annons'?' sponsored':'')+'" data-tip="'+esc(x.id)+'">'
@@ -739,7 +768,7 @@ function itemHTML(c){ const dt=fmtDate(c); const mine=[...new Set(c.e.map(e=>mat
    +(mine.length?'<span class="tag you">'+esc(t('cls_present',mine.join(', ')))+'</span>':'')
    +'<span class="tag src">'+srcLink(c).name+'</span></div></div><div class="iside">'+starBtn(c)+'<span class="dist">'+(c.dist!=null?Math.round(c.dist)+' km':'')+'</span></div></div>'; }
 function paneList(list){
-  let h=calloutHTML();
+  let h=pinnedHTML()+calloutHTML();
   if(msg){ h+='<p class="summary" style="color:var(--warn)">'+esc(msg)+'</p>'; msg=''; }
   let shown=list;
   if(S.focusKey){ shown=list.filter(c=>c.key===S.focusKey); h+='<p class="summary">'+t('n_comps',shown.length)+' '+esc(t('in_place',shown[0]?.c||''))+' · <button class="back" id="allbtn">'+esc(t('show_all'))+'</button></p>'; }
@@ -845,7 +874,11 @@ function bindPane(){
     if(b.classList.contains('item')) b.addEventListener('keydown',e=>{ if((e.key==='Enter'||e.key===' ')&&!e.target.closest('.star')){ e.preventDefault(); go(); } }); });
   pane.querySelectorAll('.star').forEach(b=>b.addEventListener('click',e=>{ e.stopPropagation(); toggleFav(D.comps[+b.dataset.fav]); }));
   pane.querySelectorAll('[data-ics]').forEach(b=>b.addEventListener('click',()=>downloadICS([D.comps[+b.dataset.ics]])));
-  pane.querySelectorAll('[data-tip]').forEach(a=>{ a.addEventListener('click',()=>track('Tips klick',{namn:a.dataset.tip})); if(tipSeen.has(a.dataset.tip)) return; tipObs&&tipObs.observe(a); });
+  pane.querySelectorAll('a.tipcard[data-tip]').forEach(a=>{ a.addEventListener('click',()=>track('Tips klick',{namn:a.dataset.tip})); if(tipSeen.has(a.dataset.tip)) return; tipObs&&tipObs.observe(a); });
+  pane.querySelectorAll('[data-ad]').forEach(card=>{ const id=card.dataset.ad;
+    card.querySelectorAll('[data-adlink]').forEach(a=>a.addEventListener('click',()=>track('Tips klick',{namn:id,mal:a.dataset.adlink})));
+    card.querySelectorAll('[data-adopen]').forEach(b=>b.addEventListener('click',()=>{ track('Tips klick',{namn:id,mal:'visa'}); S.sel=+b.dataset.adopen; S.tab='list'; S.focusKey=D.comps[S.sel].key; render(); }));
+    if(!tipSeen.has(id)&&tipObs){ card.dataset.tip=id; tipObs.observe(card); } });
   pane.querySelectorAll('[data-cal]').forEach(a=>a.addEventListener('click',()=>track('Kalender',{typ:a.dataset.cal})));
   pane.querySelectorAll('.links a').forEach(a=>a.addEventListener('click',()=>track('Till källa',{källa:/easyrecord/.test(a.href)?'EasyRecord':/trackandfield/.test(a.href)?'Track & Field':/rosterathletics/.test(a.href)?'Roster Athletics':'Webathletics'})));
   pane.querySelectorAll('.calform').forEach(f=>f.addEventListener('submit',e=>{ e.preventDefault(); sendInvites(f); }));
