@@ -252,6 +252,8 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .caldirect,.fcal{display:flex;gap:6px 12px;flex-wrap:wrap;align-items:center;font-size:12.5px}
 .caldirect a,.caldirect button,.fcal a,.fcal button{color:var(--track);background:none;border:0;padding:0;cursor:pointer;font-weight:600;text-decoration:none;font-size:12.5px}
 .caldirect button:disabled{opacity:.45;cursor:default}
+.tag.champ{border-color:var(--star);color:var(--star);background:var(--star-soft);font-weight:600}
+.tag.kids{border-color:var(--good);color:var(--good)}
 .tag.disc{border-color:var(--track);color:var(--track);background:var(--track-soft);font-weight:600}
 .field.active select{border:2px solid var(--track);background:var(--track-soft);font-weight:600}
 .ev.hit>summary span:first-child,.ev.hit .evrow span:first-child{color:var(--track);font-weight:700}
@@ -356,7 +358,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 
   <footer class="about">
     <h2 data-i18n="about_h">Friidrottstävlingar i Sverige och utomlands</h2>
-    <p><span data-i18n="about_p">Friidrottskartan samlar kommande friidrottstävlingar i Sverige och utomlands på ett ställe, med data från EasyRecord, Webathletics, Track &amp; Field och Roster Athletics. Inomhus och utomhus, för ungdomar, juniorer, seniorer, veteraner och paraidrottare. Välj klass, land och ort och se tävlingarna på kartan med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa och ser hur du ligger till mot de anmälda i din klass. Spara favoriter och lägg in dem i din kalender. Datan uppdateras varje natt.</span> <span id="credits"></span> <a href="integritet.html" data-i18n="about_privacy">Om integritet</a> · <a href="#annonsera" data-i18n="ad_h">Annonsera hos oss</a></p>
+    <p><span data-i18n="about_p">Friidrottskartan samlar kommande friidrottstävlingar i Sverige och utomlands på ett ställe, med data från EasyRecord, Webathletics, Track &amp; Field, Roster Athletics och Svensk Friidrotts tävlingskalender. Inomhus och utomhus, för ungdomar, juniorer, seniorer, veteraner och paraidrottare. Välj klass, land och ort och se tävlingarna på kartan med datum, arena, arrangör och sista anmälningsdag. Under Mina PB skriver du in dina personbästa och ser hur du ligger till mot de anmälda i din klass. Spara favoriter och lägg in dem i din kalender. Datan uppdateras varje natt.</span> <span id="credits"></span> <a href="integritet.html" data-i18n="about_privacy">Om integritet</a> · <a href="#annonsera" data-i18n="ad_h">Annonsera hos oss</a></p>
   </footer>
 </div>
 
@@ -375,7 +377,7 @@ let LANG=(()=>{ const s=store.get('fk-lang',null); return s&&I18N[s]? s : 'sv'; 
 const FB={lbl_disc:'Gren',opt_alld:'Alla grenar',with_disc:(d,c)=>'med '+d+(c?' för '+c:''),disc_hint:'Tips: välj din klass överst, så visas bara tävlingar där grenen finns i din klass.',
   tip_label:'Tips från oss',ad_label:'Annons',tip_cta_yt:'Se på YouTube',tip_cta:'Läs mer',ad_h:'Annonsera hos oss',ad_p:'Vill ditt företag eller din förening synas på Friidrottskartan? Lämna dina uppgifter så kontaktar vi dig med paket och priser.',
   af_org:'Företag/förening',af_phone:'Telefon',af_cc:'Landskod',af_btn:'Skicka förfrågan',af_ok:'Tack! Vi hör av oss inom ett par dagar.',af_invalid:'Fyll i namn, företag/förening och en giltig e-postadress.',af_mail:'Skicka förfrågan via e-post i stället',af_note:l=>'Vi använder uppgifterna bara för att svara på din förfrågan. Läs mer i '+l+'.',
-  n_teams:n=>n+' lag',tagline:'Alla tävlingar på samma sida',disc_none:(d,c)=>'Ingen kommande tävling har '+d+(c?' för '+c:'')+' just nu. Grenarna uppdateras varje natt, så titta gärna igen senare.',nf_activate:'Formuläret håller på att aktiveras. Försök igen om en liten stund.',nf_mail:'Skicka anmälan via e-post i stället'};
+  n_teams:n=>n+' lag',tag_champ:'Mästerskap',tag_kids:'Barntävling',sf_note:'Tävlingen är sanktionerad av Svensk Friidrott men anmälan och grenprogram är inte öppna i något anmälningssystem än. Se tävlingssidan för mer information.',tagline:'Alla tävlingar på samma sida',disc_none:(d,c)=>'Ingen kommande tävling har '+d+(c?' för '+c:'')+' just nu. Grenarna uppdateras varje natt, så titta gärna igen senare.',nf_activate:'Formuläret håller på att aktiveras. Försök igen om en liten stund.',nf_mail:'Skicka anmälan via e-post i stället'};
 const t=(k,...a)=>{ let v=I18N[LANG][k]; if(v===undefined) v=I18N.sv[k]; if(v===undefined) v=FB[k]; return typeof v==='function'? v(...a) : (v===undefined?k:v); };
 const LOC={sv:'sv-SE',en:'en-GB',de:'de-DE',fr:'fr-FR',es:'es-ES',fi:'fi-FI',da:'da-DK'};
 let MON=[];
@@ -515,7 +517,8 @@ const SRC={
   er:c=>({name:'EasyRecord', list:'https://easyrecord.se/startlist?c='+c.id, info:'https://easyrecord.se/info?c='+c.id, lt:'lt_start'}),
   wa:c=>({name:'Webathletics', list:'https://webathletics.se/entrylist/'+c.id, lt:'lt_entry'}),
   tf:c=>({name:'Track & Field', list:'https://www.trackandfield.se/Home/Competition?comp='+c.id, info:'https://www.trackandfield.se/CompInfo?comp='+c.id, lt:'lt_start'}),
-  ro:c=>({name:'Roster Athletics', list:'https://meets.rosterathletics.com/public/meeting/'+c.id+'/details', lt:'lt_page'})};
+  ro:c=>({name:'Roster Athletics', list:'https://meets.rosterathletics.com/public/meeting/'+c.id+'/details', lt:'lt_page'}),
+  sf:c=>({name:'Svensk Friidrott', list:'https://tavlingsansokan.friidrott.se/orderdetails/'+c.id+'?isCompetitionCalendar=True', lt:'lt_page'})};
 const srcLink=c=>(SRC[c.s]||SRC.wa)(c);
 const clsMatch=(evCls,my)=>{ if(!my) return false; const p=evCls.split(' '); if(p.includes(my)) return true;
   const v=my.match(/^([KM])(\d{2})$/); return !!(v && +v[2]>=35 && p.includes(v[1]+'V')); };
@@ -597,7 +600,7 @@ function fillCities(){ const seen=new Set(); $('#citylist').innerHTML=cityPool()
   $('#city').placeholder=S.country==='SWE'?t('ph_city_swe'):S.country==='all'?t('ph_city_all'):t('ph_city_eg',((cityPool().find(c=>D.comps.some(x=>x.c===c[0]&&x.co===c[3]))||[''])[0])); }
 const months=[...new Set(D.comps.map(c=>c.d1.slice(0,7)))].sort();
 function fillPeriod(){ $('#period').innerHTML='<option value="all">'+esc(t('opt_allp'))+'</option>'+months.map(k=>{const [yy,mm]=k.split('-');return '<option value="'+k+'">'+MON[mm-1].replace(/^./,x=>x.toUpperCase())+' '+yy+'</option>'}).join(''); $('#period').value=S.period; }
-function fillStamp(){ const src=[['https://easyrecord.se/','EasyRecord'],['https://webathletics.se/','Webathletics'],['https://www.trackandfield.se/','Track &amp; Field'],['https://meets.rosterathletics.com/public/competitions','Roster Athletics']].map(([u,n])=>'<a href="'+u+'" target="_blank" rel="noopener">'+n+'</a>');
+function fillStamp(){ const src=[['https://easyrecord.se/','EasyRecord'],['https://webathletics.se/','Webathletics'],['https://www.trackandfield.se/','Track &amp; Field'],['https://meets.rosterathletics.com/public/competitions','Roster Athletics'],['https://tavlingsansokan.friidrott.se/t%C3%A4vlingskalender','Svensk Friidrotts tävlingskalender']].map(([u,n])=>'<a href="'+u+'" target="_blank" rel="noopener">'+n+'</a>');
   const links=src.slice(0,-1).join(', ')+' '+t('and')+' '+src[src.length-1];
   const [y,m,dd]=D.updated.split('-'); $('#stamp').innerHTML=t('stamp',links,(+dd)+' '+MON[m-1]+' '+y)+' · <a href="integritet.html">'+esc(t('privacy'))+'</a>'; }
 const hasDisc=(c,d)=>c.e.some(e=>e[1]===d&&(!profile.cls||clsMatch(e[0],profile.cls)));
@@ -734,6 +737,7 @@ function calloutHTML(){ return profile.cls||myClasses().length? '' : '<div class
 function itemHTML(c){ const dt=fmtDate(c); const mine=[...new Set(c.e.map(e=>matchMine(e[0])).filter(Boolean))]; const n=c.e.reduce((a,e)=>a+e[3],0);
   return '<div class="item" role="button" tabindex="0" data-i="'+c.idx+'"><div class="date"><b>'+dt.big+'</b><span>'+dt.small+'</span></div><div><h3>'+esc(c.n)+'</h3><div class="meta">'+esc(c.c)+(c.v?' · '+esc(c.v):'')+(S.country==='all'&&c.co!=='SWE'?' · '+esc(coName(c.co)):'')+'</div><div class="tags">'
    +'<span class="tag">'+(c.i?t('t_in'):t('t_out'))+'</span>'
+   +(c.lv==='M'?'<span class="tag champ">'+esc(t('tag_champ'))+'</span>':c.lv==='B'?'<span class="tag kids">'+esc(t('tag_kids'))+'</span>':'')
    +(n?'<span class="tag">'+t('n_entries',n)+'</span>':'<span class="tag">'+t('no_entries')+'</span>')
    +(S.disc!=='all'?(()=>{ const n=c.e.filter(e=>e[1]===S.disc&&(!profile.cls||clsMatch(e[0],profile.cls))).reduce((a,e)=>a+e[3],0); return '<span class="tag disc">'+esc(discName(S.disc))+(profile.cls?' '+esc(profile.cls):'')+': '+esc(n?(isRelay(S.disc)?t('n_teams',n):t('n_short',n)):t('no_entries'))+'</span>'; })():'')
    +(mine.length?'<span class="tag you">'+esc(t('cls_present',mine.join(', ')))+'</span>':'')
@@ -769,7 +773,7 @@ function paneDetail(c){
    +(c.dist!=null?'<dt>'+t('f_dist')+'</dt><dd>'+esc(t('km_from',Math.round(c.dist),S.cityName))+'</dd>':'')+'</dl>'
    +'<div class="links"><a href="'+L.list+'" target="_blank" rel="noopener">'+esc(t('on_src',t(L.lt),L.name))+' ↗</a>'+(L.info?'<a href="'+L.info+'" target="_blank" rel="noopener">'+esc(t('info_reg'))+' ↗</a>':'')+'</div>'
    +calBox(c);
-  if(!c.e.length) h+='<p class="empty">'+esc(t('no_events',L.name))+'</p>';
+  if(!c.e.length) h+='<p class="empty">'+esc(c.s==='sf'?t('sf_note'):t('no_events',L.name))+'</p>';
   byCls.forEach(([cls,evs])=>{ const mc=matchMine(cls);
     h+='<div class="clsh">'+esc(clsLabel(cls))+(mc?' <span class="tag you">'+esc(t('your_cls'))+(mc!==cls?' · '+mc:'')+'</span>':'')+'</div>';
     evs.forEach(ev=>{ const my=mc?pbOf(mc)[ev[1]]:0; let badge='';
@@ -779,7 +783,7 @@ function paneDetail(c){
       if(!ev[3]){ h+='<div class="ev empty-ev'+(hit?' hit':'')+'"><div class="evrow"><span>'+esc(discName(ev[1]))+'</span><span class="n">'+esc(t('no_entries'))+(my>0?' · <b style="color:var(--you)">'+esc(t('you_cls',mc))+' '+fmtMark(my,ev[1])+'</b>':'')+'</span></div></div>'; return; }
       h+='<details class="ev'+(hit?' hit':'')+'"'+(mc||hit?' open':'')+'><summary><span>'+esc(discName(ev[1]))+(ev[2]?' <span class="meta">'+ev[2].slice(5)+'</span>':'')+'</span><span class="n">'+t('n_entered',ev[3])+badge+'</span></summary>'+startlistHTML(ev,mc,my)+'</details>';});
   });
-  h+='<p class="note" style="margin-top:12px">'+esc(t('detail_note',L.name))+'</p>'+tipHTML(tipFor(1))+'</div>';
+  h+=(c.e.some(e=>e[3]>0)?'<p class="note" style="margin-top:12px">'+esc(t('detail_note',L.name))+'</p>':'')+tipHTML(tipFor(1))+'</div>';
   return h;
 }
 const phFor=d=> isField(d)?t('ph_field'):(LONG.includes(d)?t('ph_long'):t('ph_sprint'));
@@ -847,7 +851,7 @@ function bindPane(){
   pane.querySelectorAll('[data-ics]').forEach(b=>b.addEventListener('click',()=>downloadICS([D.comps[+b.dataset.ics]])));
   pane.querySelectorAll('[data-tip]').forEach(a=>{ a.addEventListener('click',()=>track('Tips klick',{namn:a.dataset.tip})); if(tipSeen.has(a.dataset.tip)) return; tipObs&&tipObs.observe(a); });
   pane.querySelectorAll('[data-cal]').forEach(a=>a.addEventListener('click',()=>track('Kalender',{typ:a.dataset.cal})));
-  pane.querySelectorAll('.links a').forEach(a=>a.addEventListener('click',()=>track('Till källa',{källa:/easyrecord/.test(a.href)?'EasyRecord':/trackandfield/.test(a.href)?'Track & Field':/rosterathletics/.test(a.href)?'Roster Athletics':'Webathletics'})));
+  pane.querySelectorAll('.links a').forEach(a=>a.addEventListener('click',()=>track('Till källa',{källa:/easyrecord/.test(a.href)?'EasyRecord':/trackandfield/.test(a.href)?'Track & Field':/rosterathletics/.test(a.href)?'Roster Athletics':/friidrott\.se/.test(a.href)?'Svensk Friidrott':'Webathletics'})));
   pane.querySelectorAll('.calform').forEach(f=>f.addEventListener('submit',e=>{ e.preventDefault(); sendInvites(f); }));
   const bb=$('#backbtn'); if(bb) bb.onclick=()=>{S.sel=null; render();};
   const ab=$('#allbtn'); if(ab) ab.onclick=()=>{S.focusKey=null; S.sel=null; render();};
