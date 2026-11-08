@@ -59,7 +59,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .brand{margin:0;line-height:0}
 .brand img{height:50px;width:auto;max-width:min(320px,80vw)}
 .brand .logo-d{display:none}
-.brandwrap{display:inline-flex;flex-direction:column;width:307px;max-width:80vw}
+.brandwrap{text-decoration:none;color:inherit;cursor:pointer;display:inline-flex;flex-direction:column;width:307px;max-width:80vw}
 .brandwrap img{width:100%;height:auto}
 .tagline{display:block;line-height:1.1;margin:-9px 0 0 28.4%;font-family:var(--f-display);font-weight:600;font-size:clamp(10px,2.9vw,13px);letter-spacing:.14em;text-transform:uppercase;color:var(--track);white-space:nowrap}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .brand .logo-l{display:none}:root:not([data-theme="light"]) .brand .logo-d{display:inline}}
@@ -294,7 +294,7 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 
 <div class="app">
   <header class="top">
-    <h1 class="brand"><span class="brandwrap"><img class="logo-l" src="logo.png" alt="Friidrottskartan" width="602" height="98"><img class="logo-d" src="logo-dark.png" alt="Friidrottskartan" width="602" height="98"><span class="tagline" data-i18n="tagline">Alla tävlingar på samma sida</span></span></h1>
+    <h1 class="brand"><a class="brandwrap" id="homelink" href="/" aria-label="Friidrottskartan – till startsidan"><img class="logo-l" src="logo.png" alt="Friidrottskartan" width="602" height="98"><img class="logo-d" src="logo-dark.png" alt="Friidrottskartan" width="602" height="98"><span class="tagline" data-i18n="tagline">Alla tävlingar på samma sida</span></a></h1>
     <div class="hright">
       <div class="stamp" id="stamp">Kommande friidrottstävlingar från EasyRecord, Webathletics, Track &amp; Field och Roster Athletics · <a href="integritet.html">Integritet</a></div>
       <div class="langsel" id="langsel">
@@ -656,6 +656,7 @@ $('#period').addEventListener('change',()=>{S.period=$('#period').value; render(
 $('#disc').addEventListener('change',()=>{S.disc=$('#disc').value; S.focusKey=null; S.sel=null; S.tab='list'; fillDisc(); render(true); if(S.disc!=='all') track('Välj gren',{gren:S.disc,klass:profile.cls||'–'}); });
 document.querySelectorAll('[data-io]').forEach(b=>b.addEventListener('click',()=>{S.io=b.dataset.io; document.querySelectorAll('[data-io]').forEach(x=>x.setAttribute('aria-pressed',x===b)); render();}));
 $('#onlymine').addEventListener('click',()=>{S.onlyMine=!S.onlyMine; $('#onlymine').setAttribute('aria-pressed',S.onlyMine); render();});
+$('#homelink').addEventListener('click',ev=>{ if(ev.metaKey||ev.ctrlKey||ev.shiftKey||ev.button) return; ev.preventDefault(); S.sel=null; S.focusKey=null; S.tab='list'; render(); window.scrollTo({top:0,behavior:'smooth'}); const p=$('#pane'); if(p) p.scrollTop=0; });
 $('#reset').addEventListener('click',()=>{S.center=null;S.cityName='';$('#city').value='';S.focusKey=null;S.sel=null;S.disc='all';fillDisc();store.set('fk-state',{radius:S.radius,country:S.country});render(true);});
 let lastTracked='';
 function applySearch(){ const c=findCity($('#city').value); if(!c){ S.center=null; S.cityName=''; if($('#city').value.trim()) msg=t('not_found',$('#city').value.trim()); render(true); return;}
