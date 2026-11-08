@@ -267,11 +267,12 @@ header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:spac
 .addate b{font-size:19px}
 .adbody h3{margin:0;font-family:var(--f-display);font-size:17px;line-height:1.05;text-transform:uppercase;letter-spacing:.01em;color:var(--ad)}
 .admeta{font-size:12.5px;margin-top:1px}
+.adcount{display:inline-flex;align-items:center;gap:5px;margin-top:4px;padding:1px 8px;border-radius:999px;background:color-mix(in srgb,var(--ad) 14%,transparent);color:var(--ad);font-weight:600;font-size:12.5px}
 .adkort{font-size:12.5px;margin-top:2px;color:var(--ink)}
 .adbtns{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;margin-top:6px}
 .adbtn{background:var(--ad);border-color:var(--ad);color:#fff!important;text-decoration:none;padding:4px 10px;font-size:13px;min-height:0;line-height:1.3}
 .adsec{background:none;border:0;padding:0;color:var(--ad);font-weight:600;font-size:12.5px;cursor:pointer;text-decoration:none}
-@media (prefers-color-scheme: dark){.adbody h3,.adsec,.addate{filter:brightness(1.5)}}
+@media (prefers-color-scheme: dark){.adbody h3,.adsec,.addate,.adcount{filter:brightness(1.5)}}
 .tipcard{display:grid;grid-template-columns:minmax(0,190px) minmax(0,1fr);gap:12px;align-items:center;margin:10px 0;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);text-decoration:none}
 .tipcard:hover{border-color:var(--track)}
 .tipcard.noimg{grid-template-columns:minmax(0,1fr)}
@@ -515,6 +516,7 @@ function pinnedHTML(){ const x=TIPS.find(a=>a.fast&&a.format==='tavling'); if(!x
    +'<div class="adtop"><span class="adlbl">'+esc(t('ad_label'))+'</span>'+(x.arrangor?'<span class="adorg">'+esc(x.arrangor)+'</span>':'')+'</div>'
    +'<div class="adbody"><div class="date addate"><b>'+(+dd||'')+'</b><span>'+(mm?MON[mm-1]:'')+'</span></div><div>'
    +'<h3>'+esc(x.titel)+'</h3><div class="meta admeta">'+esc(x.plats||'')+'</div>'
+   +(c?(()=>{const n=c.e.reduce((a,e)=>a+e[3],0);return '<div class="adcount"><svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M16 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm-8 0a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm0 2c-2.7 0-8 1.3-8 4v2h16v-2c0-2.7-5.3-4-8-4zm8 0c-.3 0-.7 0-1.1.1 1.2.9 2.1 2.1 2.1 3.9v2h7v-2c0-2.7-5.3-4-8-4z"/></svg>'+esc(n?t('n_entries',n):t('no_entries'))+'</div>';})():'')
    +(x.kort?'<div class="adkort">'+esc(x.kort)+'</div>':'')
    +'<div class="adbtns"><a class="btn adbtn" href="'+esc(x.lank)+'" target="_blank" rel="sponsored noopener" data-adlink="anmalan">'+esc(x.cta||'Läs mer')+' ↗</a>'
    +(x.inbjudan?'<a class="adsec" href="'+esc(x.inbjudan)+'" target="_blank" rel="sponsored noopener" data-adlink="inbjudan">'+esc(tt('ad_invite','Inbjudan'))+' ↗</a>':'')
