@@ -307,7 +307,7 @@ async function scrapeTrackAndField(cityCoords) {
       const rm = info.reg.match(/(\d{1,2})\s+([a-zåäö]{3})/i);
       if (rm) { const mo = MON[rm[2].toLowerCase()]; const y = +head.d1.slice(0, 4) - (mo > +head.d1.slice(5, 7) ? 1 : 0); r = `${y}-${pad(mo)}-${pad(+rm[1])}`; }
       const e = [];
-      for (const [n, pbs] of parseTfEntries(await get(`${TF}/Entries/LoadClassEvents?compId=${id}`))) {
+      for (const [n, pbs] of parseTfEntries(await get(`${TF}/Entries/LoadClassEvents?compId=${id}&classId=0`))) {
         const sp = splitEvent(n); if (!sp) continue;
         e.push(anonEvent(sp[0], sp[1], '', pbs.map(p => tfMark(p, sp[1]))));
       }
